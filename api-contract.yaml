@@ -93,6 +93,8 @@ components:
         confidence: { type: number, minimum: 0, maximum: 1 }
         risk_level: { type: string, enum: [low, medium, high, critical] }
         trend: { type: string, enum: [stable, degrading, accelerating] }
+        degradation_analysis:
+          $ref: "#/components/schemas/DegradationAnalysis" 
 
     AnomalyResponseData:
       type: object
@@ -103,6 +105,31 @@ components:
         abnormal_sensors:
           type: array
           items: { type: string }
+
+
+    SensorAnomaly:
+      type: object
+      properties:
+        sensor: { type: string, description: "Sensor name e.g. sensor_2" }
+        direction: { type: string, enum: [rising, falling, fluctuating] }
+        severity: { type: number, minimum: 0, maximum: 1 }
+        z_score: { type: number }
+        description: { type: string, description: "Human-readable anomaly description" }
+
+    DegradationAnalysis:
+      type: object
+      description: "Sensor anomaly details for Module B fault diagnosis. KEY interface between A and B."
+      properties:
+        top_abnormal_sensors:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorAnomaly"
+        degradation_pattern:
+          type: string
+          enum: [normal, thermal_efficiency_loss, mechanical_wear, flow_path_degradation, compressor_stall_risk]
+        pattern_confidence: { type: number }
+        feature_importance: { type: object }
+        analysis_method: { type: string }
 
     DiagnosisRequest:
       type: object
