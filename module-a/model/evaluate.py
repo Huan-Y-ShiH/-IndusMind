@@ -15,9 +15,9 @@ matplotlib.use("Agg")  # Non-interactive backend for headless/ModelArts
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from model.lstm_transformer import LSTMTransformerRUL, RMSELoss, RULScore, create_model
+
+from lstm_transformer import LSTMTransformerRUL, RMSELoss, RULScore, create_model
 from torch.utils.data import DataLoader, TensorDataset
 
 

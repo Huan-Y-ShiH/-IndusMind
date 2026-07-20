@@ -82,11 +82,10 @@ class LSTMTransformerRUL(nn.Module):
         self.lstm = nn.LSTM(
             d_model, lstm_hidden,
             num_layers=lstm_layers,
-            batch_first=True,
             bidirectional=True,
             dropout=lstm_dropout if lstm_layers > 1 else 0.0,
         )
-        lstm_out_dim = lstm_hidden * 2  # bidirectional → 2x hidden
+        lstm_out_dim = lstm_hidden * 2
         
         # Project LSTM output to d_model for Transformer
         self.lstm_proj = nn.Linear(lstm_out_dim, d_model)
@@ -101,7 +100,6 @@ class LSTMTransformerRUL(nn.Module):
             dim_feedforward=ff_dim,
             dropout=transformer_dropout,
             activation="gelu",
-            batch_first=True,
         )
         self.transformer = nn.TransformerEncoder(
             encoder_layer, num_layers=num_encoder_layers
@@ -139,9 +137,11 @@ class LSTMTransformerRUL(nn.Module):
         # Input projection
         x = self.input_proj(x)  # (batch, seq_len, d_model)
         
-        # LSTM
-        lstm_out, _ = self.lstm(x)  # (batch, seq_len, lstm_hidden*2)
-        lstm_out = self.lstm_proj(lstm_out)  # (batch, seq_len, d_model)
+        # LSTM (PyTorch 1.8: needs (seq_len, batch, features) format)
+        x_t = x.transpose(0, 1)  # (batch, seq, d) -> (seq, batch, d)
+        lstm_out, _ = self.lstm(x_t)
+        lstm_out = lstm_out.transpose(0, 1)  # (seq, batch, d*2) -> (batch, seq, d*2)
+        lstm_out = self.lstm_proj(lstm_out)
         
         # Positional encoding
         lstm_out = self.pos_encoder(lstm_out)
