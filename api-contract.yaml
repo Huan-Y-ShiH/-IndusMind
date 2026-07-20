@@ -1,0 +1,250 @@
+openapi: "3.0.3"
+info:
+  title: IndusMind API Contract
+  description: |
+    **统一API契约 —— 所有模块必须遵守**
+    这是IndusMind项目的接口"宪法"。三人对着同一份契约开发，接口不对就调不通。
+    修改此文件前必须三人讨论同意。
+  version: "1.0.0"
+  contact:
+    name: IndusMind Team
+
+servers:
+  - url: http://module-a:8001
+    description: Module A - Prediction Engine (Docker)
+  - url: http://module-b:8002
+    description: Module B - Agent Engine (Docker)
+  - url: http://module-c:8003
+    description: Module C - API Gateway (Docker)
+  - url: http://localhost:8001
+    description: Module A - local dev
+  - url: http://localhost:8002
+    description: Module B - local dev
+  - url: http://localhost:8003
+    description: Module C - local dev
+
+# ============================================
+# 铁律 #1: 统一响应格式
+# 所有API必须返回: {"code": 0, "data": {...}, "msg": "success"}
+# code=0=成功, 非0=错误
+# ============================================
+
+components:
+  schemas:
+    APIResponse:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: integer
+          description: "0=success, non-zero=error"
+        data:
+          type: object
+        msg:
+          type: string
+          default: "success"
+
+    SensorReading:
+      type: object
+      description: "21-channel sensor reading at one timestamp"
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        sensor_1:  { type: number, description: "Fan inlet temperature (°R)" }
+        sensor_2:  { type: number, description: "LPC outlet temperature (°R)" }
+        sensor_3:  { type: number, description: "HPC outlet temperature (°R)" }
+        sensor_4:  { type: number, description: "LPT outlet temperature (°R)" }
+        sensor_5:  { type: number, description: "Fan inlet Pressure (psia)" }
+        sensor_6:  { type: number, description: "Bypass duct pressure (psia)" }
+        sensor_7:  { type: number, description: "HPC outlet pressure (psia)" }
+        sensor_8:  { type: number, description: "Physical fan speed (rpm)" }
+        sensor_9:  { type: number, description: "Physical core speed (rpm)" }
+        sensor_10: { type: number, description: "Engine pressure ratio" }
+        sensor_11: { type: number, description: "HPC outlet Static pressure (psia)" }
+        sensor_12: { type: number, description: "Ratio of fuel flow to Ps30" }
+        sensor_13: { type: number, description: "Corrected fan speed (rpm)" }
+        sensor_14: { type: number, description: "Corrected core speed (rpm)" }
+        sensor_15: { type: number, description: "Bypass ratio" }
+        sensor_16: { type: number, description: "Burner fuel-air ratio" }
+        sensor_17: { type: number, description: "Bleed enthalpy" }
+        sensor_18: { type: number, description: "Demanded fan speed (rpm)" }
+        sensor_19: { type: number, description: "Demanded corrected fan speed (rpm)" }
+        sensor_20: { type: number, description: "HPT coolant bleed (lbm/s)" }
+        sensor_21: { type: number, description: "LPT coolant bleed (lbm/s)" }
+
+    RULRequest:
+      type: object
+      required: [device_id, sensor_data]
+      properties:
+        device_id:
+          type: string
+          description: "Device/engine identifier"
+        sensor_data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SensorReading"
+
+    RULResponseData:
+      type: object
+      properties:
+        device_id: { type: string }
+        rul_hours: { type: number, description: "RUL in hours" }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        risk_level: { type: string, enum: [low, medium, high, critical] }
+        trend: { type: string, enum: [stable, degrading, accelerating] }
+
+    AnomalyResponseData:
+      type: object
+      properties:
+        device_id: { type: string }
+        anomaly_score: { type: number, minimum: 0, maximum: 1 }
+        is_anomaly: { type: boolean }
+        abnormal_sensors:
+          type: array
+          items: { type: string }
+
+    DiagnosisRequest:
+      type: object
+      required: [device_id, anomaly_features]
+      properties:
+        device_id: { type: string }
+        anomaly_features:
+          type: object
+          properties:
+            high_vibration: { type: boolean }
+            temperature_trend: { type: string }
+            abnormal_sensors:
+              type: array
+              items: { type: string }
+        context:
+          type: object
+          properties:
+            rul_hours: { type: number }
+            risk_level: { type: string }
+
+    DiagnosisResponseData:
+      type: object
+      properties:
+        root_cause: { type: string }
+        confidence: { type: number }
+        evidence:
+          type: array
+          items: { type: string }
+        related_cases:
+          type: array
+          items: { type: string }
+
+# ============================================
+# Module A: Prediction Engine (人A)
+# ============================================
+paths:
+  /api/v1/predict/rul:
+    post:
+      tags: [Module A - Prediction]
+      summary: "Predict Remaining Useful Life (RUL)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RULRequest"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/APIResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/RULResponseData"
+
+  /api/v1/predict/anomaly:
+    post:
+      tags: [Module A - Prediction]
+      summary: "Detect anomalies in sensor reading"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, sensor_data]
+              properties:
+                device_id: { type: string }
+                sensor_data:
+                  $ref: "#/components/schemas/SensorReading"
+      responses:
+        "200":
+          description: "Success"
+
+  /api/v1/predict/health:
+    get:
+      tags: [Module A - Prediction]
+      summary: "Health check"
+      responses:
+        "200":
+          description: "OK"
+
+  # ============================================
+  # Module B: Agent Engine (人B)
+  # ============================================
+  /api/v1/diagnose:
+    post:
+      tags: [Module B - Agent]
+      summary: "Fault diagnosis via LLM+RAG"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiagnosisRequest"
+      responses:
+        "200":
+          description: "Success"
+
+  /api/v1/workflow/full:
+    post:
+      tags: [Module B - Agent]
+      summary: "Complete agent workflow (predict → diagnose → solution → notify)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RULRequest"
+      responses:
+        "200":
+          description: "Success"
+
+  /api/v1/knowledge/search:
+    get:
+      tags: [Module B - Agent]
+      summary: "Search knowledge base"
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+
+  # ============================================
+  # Module C: Gateway & Frontend (人C)
+  # ============================================
+  /api/v1/gateway/ws:
+    get:
+      tags: [Module C - Gateway]
+      summary: "WebSocket endpoint for real-time data"
+      responses:
+        "101":
+          description: "Switching Protocols"
+
+servers:
+  - url: http://localhost:8003
+    description: Prod-like (via gateway)

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+*.egg
+
+# Model weights (large files -> use OBS or Git LFS)
+module-a/model/saved/*.pt
+module-a/model/saved/*.pth
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Frontend
+node_modules/
+dist/
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (raw datasets -> OBS)
+module-a/data/raw/*.txt
+module-a/data/raw/*.csv
+
+# Keep directory structure
+!.gitkeep

@@ -1,0 +1,34 @@
+name: CI - Module A
+
+on:
+  push:
+    branches: [dev-a/*]
+    paths:
+      - "module-a/**"
+      - "shared/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "module-a/**"
+      - "shared/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: module-a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Type check (basic)
+        run: |
+          poetry run python -c "from api.schemas import RULRequest, APIResponse; print('Schemas OK')"
