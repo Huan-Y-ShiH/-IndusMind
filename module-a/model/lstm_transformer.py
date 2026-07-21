@@ -41,6 +41,39 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
+
+class SimpleLSTM(nn.Module):
+    """Simple BiLSTM model for RUL prediction (baseline)."""
+    def __init__(self, n_features=14, hidden=128, num_layers=2, dropout=0.3):
+        super().__init__()
+        self.lstm = nn.LSTM(n_features, hidden, num_layers=num_layers,
+                            bidirectional=True, dropout=dropout if num_layers > 1 else 0)
+        pool_dim = hidden * 4  # BiLSTM last + mean
+        self.fc = nn.Sequential(
+            nn.Linear(pool_dim, 64),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(64, 1),
+        )
+
+    def forward(self, x, save_attention=False):
+        # x: (batch, seq, features)
+        x_t = x.transpose(0, 1)  # (seq, batch, features)
+        lstm_out, _ = self.lstm(x_t)
+        lstm_out = lstm_out.transpose(0, 1)  # (batch, seq, hidden*2)
+        # Use last timestep + mean pooling
+        last = lstm_out[:, -1, :]  # (batch, hidden*2)
+        mean = lstm_out.mean(dim=1)  # (batch, hidden*2)
+        pooled = torch.cat([last, mean], dim=-1)  # (batch, hidden*4)
+        return F.relu(self.fc(pooled)), None
+
+
+def create_simple_lstm(n_features=14, **kwargs):
+    defaults = dict(n_features=n_features, hidden=128, num_layers=2, dropout=0.3)
+    defaults.update(kwargs)
+    return SimpleLSTM(**defaults)
+
+
 class LSTMTransformerRUL(nn.Module):
     """
     LSTM + Transformer Encoder hybrid model for RUL prediction.
@@ -146,20 +179,21 @@ class LSTMTransformerRUL(nn.Module):
         # Positional encoding
         lstm_out = self.pos_encoder(lstm_out)
         
-        # Transformer Encoder
+        # Transformer Encoder (PyTorch 1.8: expects seq-first format)
+        lstm_out_t = lstm_out.transpose(0, 1)  # (batch, seq, d) -> (seq, batch, d)
         if save_attention or self._save_attention:
-            # TransformerEncoder doesn't support output_attentions directly,
-            # so we access the last layer's attention manually.
-            trans_out = self.transformer(lstm_out)
+            trans_out_t = self.transformer(lstm_out_t)
+            trans_out = trans_out_t.transpose(0, 1)  # back to (batch, seq, d)
             # For attention extraction, do a manual forward
             # with output_attentions on the last layer
             trans_out2, attn = self.transformer.layers[-1].self_attn(
-                lstm_out, lstm_out, lstm_out,
+                lstm_out_t, lstm_out_t, lstm_out_t,
                 need_weights=True, average_attn_weights=False
             )
             self._saved_attentions = attn.detach()  # (batch, nhead, seq_len, seq_len)
         else:
-            trans_out = self.transformer(lstm_out)
+            trans_out_t = self.transformer(lstm_out_t)
+            trans_out = trans_out_t.transpose(0, 1)
         
         # Dual pooling
         avg_pool = trans_out.mean(dim=1)  # (batch, d_model)
@@ -169,7 +203,7 @@ class LSTMTransformerRUL(nn.Module):
         # FC head
         rul_pred = self.fc(pooled)
         # RUL is always positive
-        rul_pred = F.softplus(rul_pred)
+        rul_pred = F.relu(rul_pred)
         
         return rul_pred, self._saved_attentions
     

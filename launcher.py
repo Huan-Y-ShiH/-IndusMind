@@ -1,30 +1,30 @@
 """
-ModelArts Launcher for IndusMind RUL Training.
-Runs 'python launcher.py' (no permission issue).
+ModelArts Launcher - IndusMind RUL Training (Integrated FD001-004)
 """
 import sys
 import os
 
-# Override sys.argv with ModelArts paths
-sys.path.insert(0, "/home/ma-user/modelarts/user-job-dir/code")
 sys.argv = [
     "train.py",
     "--data-path", "/home/ma-user/modelarts/inputs/data_url_0",
     "--output", "/home/ma-user/modelarts/outputs/train_url_0",
-    "--epochs", "100",
-    "--batch-size", "64",
+    "--epochs", "150",
+    "--batch-size", "128",
     "--lr", "0.001",
-    "--patience", "15",
+    "--patience", "25",
+    "--dropout", "0.4",
+    "--max-rul", "0",
+    "--weight-decay", "0.0001",
 ]
 
 print("=" * 50)
-print(" IndusMind RUL Training via launcher")
+print(" IndusMind RUL Training (FD001-004)")
 print("=" * 50)
-print(f"Args: {sys.argv}")
-print(f"Python: {sys.version}")
-print(f"CUDA available: {__import__('torch').cuda.is_available()}")
+import torch
+print(f"Python: {sys.version.split()[0]}")
+print(f"CUDA: {torch.cuda.is_available()}")
+print(f"GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'N/A'}")
 print("=" * 50)
 
-# Run train.py main()
 import train
 train.main()
