@@ -1,7 +1,7 @@
 import os, sys, argparse, time, json
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # Auto-detect import path (local: model/, ModelArts OBS: flat)
@@ -10,9 +10,24 @@ try:
 except ImportError:
     from lstm_transformer import LSTMTransformerRUL, RMSELoss, create_model, SimpleLSTM, create_simple_lstm
 
+def pick_device(requested: str) -> torch.device:
+    """Prefer CUDA (ModelArts V100), then MPS, then CPU."""
+    if requested:
+        if requested.startswith("cuda") and not torch.cuda.is_available():
+            raise RuntimeError(
+                "CUDA was explicitly requested but is unavailable. "
+                "Check the ModelArts GPU flavor and PyTorch/CUDA image."
+            )
+        return torch.device(requested)
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-path", type=str, default="./data/processed/")
+    parser.add_argument("--data-path", type=str, default="./processed/")
     parser.add_argument("--output", type=str, default="./model/saved/")
     parser.add_argument("--seq-length", type=int, default=30)
     parser.add_argument("--d-model", type=int, default=128)
@@ -30,8 +45,8 @@ def parse_args():
     parser.add_argument("--grad-clip", type=float, default=1.0)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--max-rul", type=float, default=300.0, help="Max RUL for normalization")
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--max-rul", type=float, default=0.0, help="Max RUL; 0 = auto from max_rul.npy")
+    parser.add_argument("--device", type=str, default="")
     return parser.parse_args()
 
 def set_seed(seed):
@@ -39,36 +54,101 @@ def set_seed(seed):
     np.random.seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
 
 def load_data(data_path):
     X_train = np.load(os.path.join(data_path, "X_train.npy"))
     y_train = np.load(os.path.join(data_path, "y_train.npy"))
     X_val = np.load(os.path.join(data_path, "X_val.npy"))
     y_val = np.load(os.path.join(data_path, "y_val.npy"))
+    unit_path = os.path.join(data_path, "unit_train.npy")
+    train_units = np.load(unit_path) if os.path.exists(unit_path) else None
+    val_unit_path = os.path.join(data_path, "unit_val.npy")
+    val_units = np.load(val_unit_path) if os.path.exists(val_unit_path) else None
     # Auto-detect max RUL from data
     max_rul_path = os.path.join(data_path, "max_rul.npy")
     if os.path.exists(max_rul_path):
-        max_rul = float(np.load(max_rul_path))
+        max_rul = float(np.asarray(np.load(max_rul_path)).reshape(-1)[0])
     else:
         max_rul = float(max(y_train.max(), y_val.max())) * 1.1
-    return X_train, y_train, X_val, y_val, max_rul
+    return X_train, y_train, X_val, y_val, train_units, val_units, max_rul
 
-def create_dataloaders(X_train, y_train, X_val, y_val, batch_size, num_workers):
+def create_dataloaders(
+    X_train, y_train, X_val, y_val, train_units, val_units,
+    batch_size, num_workers, device
+):
+    pin_memory = device.type == "cuda"
     train_ds = TensorDataset(
         torch.tensor(X_train, dtype=torch.float32),
         torch.tensor(y_train, dtype=torch.float32).unsqueeze(-1))
+    if val_units is not None:
+        if len(val_units) != len(X_val):
+            raise ValueError(
+                f"unit_val length {len(val_units)} does not match "
+                f"validation samples {len(X_val)}"
+            )
+        # Standard C-MAPSS evaluation: one prediction per engine, using its
+        # final available sequence only.
+        _, reverse_pos = np.unique(val_units[::-1], return_index=True)
+        endpoint_indices = np.sort(len(val_units) - 1 - reverse_pos)
+        X_eval = X_val[endpoint_indices]
+        y_eval = y_val[endpoint_indices]
+        print(
+            f"Endpoint validation: {len(endpoint_indices)} engines "
+            f"(from {len(X_val)} windows)"
+        )
+    else:
+        X_eval, y_eval = X_val, y_val
+        print(
+            "Warning: unit_val.npy not found; validating on all windows "
+            "instead of one endpoint per engine"
+        )
     test_ds = TensorDataset(
-        torch.tensor(X_val, dtype=torch.float32),
-        torch.tensor(y_val, dtype=torch.float32).unsqueeze(-1))
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+        torch.tensor(X_eval, dtype=torch.float32),
+        torch.tensor(y_eval, dtype=torch.float32).unsqueeze(-1))
+    loader_kwargs = dict(
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+    )
+    # persistent_workers needs PyTorch >= 1.7 and num_workers > 0
+    torch_major, torch_minor = torch.__version__.split(".")[:2]
+    if num_workers > 0 and (int(torch_major), int(torch_minor.split("+")[0])) >= (1, 7):
+        loader_kwargs["persistent_workers"] = True
+    if train_units is not None:
+        if len(train_units) != len(train_ds):
+            raise ValueError(
+                f"unit_train length {len(train_units)} does not match "
+                f"training samples {len(train_ds)}"
+            )
+        _, inverse, counts = np.unique(
+            train_units, return_inverse=True, return_counts=True
+        )
+        sample_weights = 1.0 / counts[inverse]
+        sampler = WeightedRandomSampler(
+            torch.as_tensor(sample_weights, dtype=torch.double),
+            num_samples=len(sample_weights),
+            replacement=True,
+        )
+        train_loader = DataLoader(train_ds, sampler=sampler, **loader_kwargs)
+        print(
+            f"Engine-balanced sampler: {len(counts)} engines, "
+            f"{len(sample_weights)} samples/epoch"
+        )
+    else:
+        train_loader = DataLoader(train_ds, shuffle=True, **loader_kwargs)
+        print("Warning: unit_train.npy not found; using unbalanced shuffle")
+    val_loader = DataLoader(test_ds, shuffle=False, **loader_kwargs)
     return train_loader, val_loader
 
 def train_epoch(model, loader, optimizer, criterion, device, grad_clip):
     model.train()
     total_loss = 0.0
+    non_blocking = device.type == "cuda"
     for X, y in loader:
-        X, y = X.to(device), y.to(device)
+        X = X.to(device, non_blocking=non_blocking)
+        y = y.to(device, non_blocking=non_blocking)
         optimizer.zero_grad()
         pred, _ = model(X)
         loss = criterion(pred, y)
@@ -83,8 +163,10 @@ def evaluate(model, loader, criterion, device):
     model.eval()
     squared_error = 0.0
     sample_count = 0
+    non_blocking = device.type == "cuda"
     for X, y in loader:
-        X, y = X.to(device), y.to(device)
+        X = X.to(device, non_blocking=non_blocking)
+        y = y.to(device, non_blocking=non_blocking)
         pred, _ = model(X)
         squared_error += torch.sum((pred - y) ** 2).item()
         sample_count += y.numel()
@@ -93,11 +175,15 @@ def evaluate(model, loader, criterion, device):
 def main():
     args = parse_args()
     set_seed(args.seed)
-    device = torch.device(args.device)
+    device = pick_device(args.device)
+    args.device = str(device)
     print(f"Device: {device}")
     print(f"Args: {json.dumps(vars(args), indent=2)}")
 
-    X_train, y_train, X_val, y_val, auto_max_rul = load_data(args.data_path)
+    (
+        X_train, y_train, X_val, y_val,
+        train_units, val_units, auto_max_rul,
+    ) = load_data(args.data_path)
     max_rul = auto_max_rul if args.max_rul <= 0 else args.max_rul
     y_train = y_train / max_rul
     y_val = y_val / max_rul
@@ -116,7 +202,9 @@ def main():
     print(f"Val:   X={X_val.shape}, y={y_val.shape}")
 
     train_loader, val_loader = create_dataloaders(
-        X_train, y_train, X_val, y_val, args.batch_size, args.num_workers)
+        X_train, y_train, X_val, y_val, train_units, val_units,
+        args.batch_size, args.num_workers, device
+    )
 
     model = create_simple_lstm(
         n_features=n_features,
@@ -169,7 +257,8 @@ def main():
     model.load_state_dict(best_checkpoint["model_state_dict"])
     torch.save(model.state_dict(), os.path.join(args.output, "final_model.pt"))
     json.dump({"best_rmse": float(best_rmse), "best_epoch": best_epoch,
-               "n_features": n_features}, open(os.path.join(args.output, "metadata.json"), "w"), indent=2)
+               "n_features": n_features, "max_rul": max_rul},
+              open(os.path.join(args.output, "metadata.json"), "w"), indent=2)
 
 if __name__ == "__main__":
     main()

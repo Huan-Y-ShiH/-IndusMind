@@ -149,8 +149,7 @@ def prepare_dataset(seq_length: int = 30) -> Tuple[np.ndarray, np.ndarray, np.nd
 if __name__ == "__main__":
     try:
         X_train, y_train, X_test, y_test = prepare_dataset()
-        print("
-✅ Data preprocessing complete!")
+        print("\n✅ Data preprocessing complete!")
     except FileNotFoundError as e:
         print(f"❌ Data files not found: {e}")
         print("Run download_data.py first to download the NASA CMAPSS dataset.")
