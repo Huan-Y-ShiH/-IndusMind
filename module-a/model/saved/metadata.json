@@ -1,0 +1,26 @@
+{
+  "model_version": "monitor-v2.0",
+  "best_rmse_cycles": 26.168465506340294,
+  "best_epoch": 25,
+  "v1_rmse_cycles": 26.27,
+  "improvement_cycles": 0.10153449365970602,
+  "promotion_threshold_cycles": 26.27,
+  "anomaly_proxy_metrics": {
+    "sample_count": 20000,
+    "healthy_false_positive_rate": 0.051029922861744514,
+    "late_detection_rate": 1.0,
+    "degradation_rank_correlation": 0.5302508596736271,
+    "healthy_count": 11797,
+    "late_count": 605,
+    "proxy_passed": true
+  },
+  "ready_for_promotion": true,
+  "attribution_validation": {
+    "samples": 8,
+    "rul_mean_abs_completeness_delta": 0.02361154556274414,
+    "rul_max_abs_completeness_delta": 0.09918212890625,
+    "anomaly_mean_abs_completeness_delta": 9.240264625987038e-05,
+    "anomaly_max_abs_completeness_delta": 0.0003826022148132324,
+    "attribution_passed": true
+  }
+}
