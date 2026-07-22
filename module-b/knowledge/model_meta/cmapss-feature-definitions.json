@@ -1,0 +1,42 @@
+{
+  "model_id": "cmapss-turbofan-seed-v1",
+  "model_type": "CMAPSS-compatible",
+  "device_model": "CMAPSS-Turbofan",
+  "feature_definitions": {
+    "s1": "风扇进口总温 T2",
+    "s2": "低压压气机出口总温 T24",
+    "s3": "高压压气机出口总温 T30",
+    "s4": "低压涡轮出口总温 T50（EGT 代理）",
+    "s5": "风扇进口压力 P2",
+    "s6": "外涵道总压 P15",
+    "s7": "高压压气机出口总压 P30",
+    "s8": "风扇物理转速 Nf",
+    "s9": "核心机物理转速 Nc",
+    "s10": "发动机压比 epr (P50/P2)",
+    "s11": "高压压气机出口静压 Ps30",
+    "s12": "燃油流量与 Ps30 之比 phi（燃油相关）",
+    "s13": "风扇换算转速 NRf",
+    "s14": "核心机换算转速 NRc",
+    "s15": "涵道比 BPR",
+    "s16": "燃烧室燃油空气比 farB",
+    "s17": "引气焓 htBleed",
+    "s18": "需求风扇转速 Nf_dmd",
+    "s19": "需求换算风扇转速 PCNfR_dmd",
+    "s20": "高压涡轮冷却引气 W31",
+    "s21": "低压涡轮冷却引气 W32"
+  },
+  "constant_or_weak_channels": ["s1", "s5", "s6", "s10", "s16", "s18", "s19"],
+  "known_blind_spots": [
+    "s1/s5/s6/s16 在 FD001 常近乎恒定，不宜单独作征兆",
+    "闭环保推力时部分压力通道方向可能被控制器抵消",
+    "docs 示例曾将 s11/s14/s15 示意为 EGT/FF/PR；本冷启动库统一为 NASA Saxena Table 2 编号"
+  ],
+  "semantic_alias_for_docs_examples": {
+    "docs_s11_EGT": "s4",
+    "docs_s14_FF": "s12",
+    "docs_s15_PR": "s10"
+  },
+  "source": "NASA Saxena et al. 2008 Damage Propagation Modeling; NTRS 20090029214",
+  "training_data_range": "CMAPSS FD001-FD004 synthetic",
+  "threshold": {"anomaly_score": 0.7}
+}

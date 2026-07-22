@@ -1,0 +1,20 @@
+{
+  "ticket_id": "WO-2023-04-02-0020",
+  "device_id": "GT-TAURUS60-01",
+  "device_model": "TAURUS-60",
+  "fault_category": "空气滤清器组件失效",
+  "actions": [
+    "压差/进气阻力检查",
+    "更换空气滤清器滤芯",
+    "检查进气系统密封与旁路泄漏",
+    "清洁进气道",
+    "恢复后功率/EGT 对比验证"
+  ],
+  "duration_hours": 3.5,
+  "cost": 2600,
+  "outcome": "resolved",
+  "linked_case_id": null,
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "WJAETS 2023 Taurus 60 FMEA (air filter package critical sub-assembly)"
+}

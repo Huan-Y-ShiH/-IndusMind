@@ -1,0 +1,26 @@
+{
+  "case_id": "case-cmapss-fd001-hpc-seed",
+  "device_id": "engine-CMAPSS-001",
+  "device_model": "CMAPSS-Turbofan",
+  "timestamp": "2008-10-01T00:00:00+00:00",
+  "anomaly_type": "trend_anomaly",
+  "rul_shape": "accelerating_decline",
+  "symptoms": [
+    {"feature": "s3", "direction": "high", "magnitude": 0.35},
+    {"feature": "s4", "direction": "high", "magnitude": 0.42},
+    {"feature": "s12", "direction": "high", "magnitude": 0.31},
+    {"feature": "s9", "direction": "high", "magnitude": 0.22},
+    {"feature": "s14", "direction": "high", "magnitude": 0.24},
+    {"feature": "s15", "direction": "low", "magnitude": 0.18}
+  ],
+  "root_cause": "高压压气机效率/流量退化",
+  "cause_category": "degradation",
+  "synthetic": true,
+  "evidence_level": "dataset_label",
+  "mechanism": "HPC 效率与流量健康参数持续下降，闭环保推力下燃油（phi）与核心转速上升，T30/T50 升高，涵道比下降。对应 CMAPSS FD001 植入故障。",
+  "verification": "仿真标签：Fault Modes = HPC Degradation（NASA CMAPSS readme）",
+  "action_taken": "性能恢复类维护（水洗/孔探评估）；仿真场景为 run-to-failure",
+  "outcome": "训练轨迹运行至健康指数归零；传感器呈单调劣化趋势",
+  "report_ref": "file://knowledge/sources/fmea_cmapss_rag/NASA_Saxena_2008_CMAPSS_DamagePropagation.pdf",
+  "source_dataset": "CMAPSS_FD001"
+}

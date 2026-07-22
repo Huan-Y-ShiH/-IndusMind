@@ -1,0 +1,20 @@
+{
+  "ticket_id": "WO-2008-10-03-0002",
+  "device_id": "engine-CMAPSS-003",
+  "device_model": "CMAPSS-Turbofan",
+  "fault_category": "风扇与压气机组合退化",
+  "actions": [
+    "复核 s8/s13/s15 与 s3/s4/s12 联合趋势",
+    "风扇叶片目视/孔探",
+    "HPC 流道孔探与间隙评估",
+    "风扇与压气机分区清洗",
+    "性能点/试车验证"
+  ],
+  "duration_hours": 9.0,
+  "cost": 18600,
+  "outcome": "resolved",
+  "linked_case_id": "case-cmapss-fd003-fan-hpc-seed",
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "NASA CMAPSS FD003 fault modes + compressor wash practice (ASME/GT literature)"
+}

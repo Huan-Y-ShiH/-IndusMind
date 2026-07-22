@@ -1,0 +1,55 @@
+---
+description: IndusMind 技术栈与目录约定（权威）
+alwaysApply: true
+---
+
+# 技术栈选型（已确定，勿随意更改）
+
+本项目是基于 RAG 的工业运维诊断 Agent（航空发动机/燃气轮机场景，对齐 NASA CMAPSS）。
+四层设计见 [docs/architecture.md](../../docs/architecture.md)。以下是确定的技术栈，改动前先跟用户确认。
+
+## 编排层
+
+- **CrewAI Flow**（`@start`/`@listen`/`@router` + Pydantic State）做核心四层确定性状态机
+  （监测→诊断→决策→报告），**不用 LangGraph**，也**不用 Hermes Agent** 之类通用自主助理。
+- 并行工具验证用 `async def` + `asyncio.gather`。
+- **CrewAI Crew**（角色化 Agent）只用于 L2/L3 多专家假设生成环节，
+  不用于核心四层管线（会丢失确定性/可评估性）。
+
+## LLM
+
+- **Qwen（通义千问，DashScope OpenAI 兼容模式）+ DeepSeek** 双通道，通过 CrewAI 内置的
+  LiteLLM 抽象接入，可按任务类型选模型并互为降级备份：
+  - 复杂因果重排 / 多跳验证 → `deepseek-reasoner`
+  - 常规结构化抽取 / 快速重排 → `qwen-plus` / `qwen-turbo`
+- 不依赖同事的盘古 API（当前独立开发阶段，盘古接口留作未来可插拔适配）。
+
+## 知识库 / RAG
+
+分两条腿走，不要混在一起（详见 [docs/knowledge-rag.md](../../docs/knowledge-rag.md)）：
+
+| 数据 | 存储 | 检索方式 |
+|---|---|---|
+| 设备手册 chunk（`knowledge/manuals/chunks/*.json`）、案例叙述（`mechanism`/`root_cause` 等文本） | **Dify 知识库** | Dify Retrieval API（语义/向量检索） |
+| FMEA 表（`knowledge/fmea/*.csv`）、FMEA L2 展开（`knowledge/fmea/*-l2.json`）、工单（`knowledge/tickets/*.json`）、特征元信息（`knowledge/model_meta/*.json`） | **本地文件，直接读** | Python 精确匹配 / Jaccard 相似度，**不上传 Dify 向量库** |
+
+`src/indusmind/rag/dify_client.py` 封装 Dify Retrieval API；
+`hybrid_search(query) -> List[dict]` 契约见 [docs/knowledge-rag.md](../../docs/knowledge-rag.md)。
+
+## 传感器编号约定
+
+统一用 **NASA CMAPSS Saxena Table 2** 编号（`s1`...`s21`）。
+真实映射见
+[knowledge/model_meta/cmapss-feature-definitions.json](../../knowledge/model_meta/cmapss-feature-definitions.json)。
+
+## 目录约定
+
+```text
+src/indusmind/
+├── llm/       # Qwen/DeepSeek 封装 + 降级策略
+├── flows/     # CrewAI Flow：核心四层状态机 + Pydantic State
+├── crews/     # CrewAI Crew：L2/L3 专家角色
+├── tools/     # CrewAI @tool：expand_fmea / 工单 / 工况 / 波形 / dify_retrieve
+├── rag/       # dify_client.py + hybrid_search
+└── schemas/   # 事件 / 诊断结果 Pydantic 模型
+```

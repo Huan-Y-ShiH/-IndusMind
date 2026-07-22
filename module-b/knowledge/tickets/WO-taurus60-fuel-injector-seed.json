@@ -1,0 +1,20 @@
+{
+  "ticket_id": "WO-2023-03-21-0018",
+  "device_id": "GT-TAURUS60-01",
+  "device_model": "TAURUS-60",
+  "fault_category": "燃油喷射器故障",
+  "actions": [
+    "排气温度场与燃烧稳定性复核",
+    "检查燃油喷射器/喷嘴堵塞与雾化",
+    "清洗或更换喷油器组件",
+    "检查燃油滤与供油压力",
+    "负载试车验证温度均匀性"
+  ],
+  "duration_hours": 8.0,
+  "cost": 15200,
+  "outcome": "resolved",
+  "linked_case_id": null,
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "WJAETS 2023 Taurus 60 FMEA (fuel injector critical sub-assembly, RPN ~90-120)"
+}

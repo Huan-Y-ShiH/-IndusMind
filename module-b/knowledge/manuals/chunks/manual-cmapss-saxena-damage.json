@@ -1,0 +1,8 @@
+{
+  "chunk_id": "manual-cmapss-saxena-damage",
+  "device_model": "CMAPSS-Turbofan",
+  "section": "4. 损伤传播与健康指数",
+  "content": "损伤传播通过对感兴趣模块的 flow 与 efficiency 施加指数型劣化轨迹来建模。健康指数 H(t) 取风扇、HPC、HPT 与 EGT 等可运行裕度的最小值；当健康指数降为 0 时判定失效。因此，压气机或涡轮效率损失会通过热力学耦合表现为排气温度裕度收窄与多路温度/燃油相关传感器漂移。文中给出了传感器随 flow/efficiency 变化的 response surface（例如 EGT 对效率与流量损失的响应），这是故障模式到传感器征兆映射的物理依据。",
+  "page": 4,
+  "source": "file://knowledge/sources/fmea_cmapss_rag/NASA_Saxena_2008_CMAPSS_DamagePropagation.pdf"
+}

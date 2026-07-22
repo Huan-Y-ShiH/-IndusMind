@@ -1,0 +1,26 @@
+{
+  "case_id": "case-cmapss-fd003-fan-hpc-seed",
+  "device_id": "engine-CMAPSS-003",
+  "device_model": "CMAPSS-Turbofan",
+  "timestamp": "2008-10-01T00:00:00+00:00",
+  "anomaly_type": "trend_anomaly",
+  "rul_shape": "accelerating_decline",
+  "symptoms": [
+    {"feature": "s3", "direction": "high", "magnitude": 0.30},
+    {"feature": "s4", "direction": "high", "magnitude": 0.38},
+    {"feature": "s8", "direction": "high", "magnitude": 0.20},
+    {"feature": "s12", "direction": "high", "magnitude": 0.28},
+    {"feature": "s13", "direction": "high", "magnitude": 0.19},
+    {"feature": "s15", "direction": "low", "magnitude": 0.25}
+  ],
+  "root_cause": "高压压气机退化叠加风扇退化",
+  "cause_category": "degradation",
+  "synthetic": true,
+  "evidence_level": "dataset_label",
+  "mechanism": "FD003 同时植入 HPC 与 Fan 的 flow/efficiency 劣化：热端温度与燃油相关通道上升，风扇转速通道与涵道比出现明显偏移。",
+  "verification": "仿真标签：Fault Modes = HPC Degradation + Fan Degradation",
+  "action_taken": "分别评估风扇与压气机流道；仿真为组合退化轨迹",
+  "outcome": "多传感器联合漂移，单一气路故障签名不足以完全解释",
+  "report_ref": "file://knowledge/sources/fmea_cmapss_rag/NASA_Saxena_2008_CMAPSS_DamagePropagation.pdf",
+  "source_dataset": "CMAPSS_FD003"
+}

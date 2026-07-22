@@ -1,0 +1,8 @@
+{
+  "chunk_id": "manual-skf-bearing-symptoms",
+  "device_model": "Rotating-Machinery",
+  "section": "轴承故障常见症状与监测",
+  "content": "轴承劣化早期可通过噪声、温度与振动监测发现。良好轴承通常发出柔和声响；研磨、尖叫或不规则噪声常指示状态变差。在工况未改变时，轴承部位温度持续升高往往预示即将损伤。常见症状包括：过热、噪声过大、振动过大、轴窜动异常、启动力矩异常。润滑不足或润滑剂错误、污染、疲劳剥落与不对中是高频根因；振动包络与特征频率（如内外圈通过频率）可用于定位。",
+  "page": 11,
+  "source": "file://knowledge/sources/fmea_cmapss_rag/SKF_Bearing_damage_and_failure_analysis.pdf"
+}

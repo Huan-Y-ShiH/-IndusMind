@@ -1,0 +1,19 @@
+{
+  "ticket_id": "WO-2025-01-10-0003",
+  "device_id": "engine-CMAPSS-001",
+  "device_model": "CMAPSS-Turbofan",
+  "fault_category": "压气机结垢预防性水洗",
+  "actions": [
+    "基于 EGT/燃油裕度趋势评估结垢程度",
+    "执行在线/离线压气机水洗",
+    "记录水洗前后 s4/s12/s3 变化",
+    "更新下次水洗间隔建议"
+  ],
+  "duration_hours": 2.5,
+  "cost": 3800,
+  "outcome": "resolved",
+  "linked_case_id": "case-cmapss-fd001-hpc-seed",
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "ASME/GT compressor wash optimization literature (fouling recovery via washing)"
+}

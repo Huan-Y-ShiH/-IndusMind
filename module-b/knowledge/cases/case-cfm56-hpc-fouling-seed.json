@@ -1,0 +1,23 @@
+{
+  "case_id": "case-cfm56-hpc-fouling-seed",
+  "device_id": "engine-A-07",
+  "device_model": "CFM56-7B",
+  "timestamp": "2025-03-22T08:14:00+08:00",
+  "anomaly_type": "trend_anomaly",
+  "rul_shape": "accelerating_decline",
+  "symptoms": [
+    {"feature": "s4", "direction": "high", "magnitude": 0.32},
+    {"feature": "s12", "direction": "high", "magnitude": 0.21},
+    {"feature": "s10", "direction": "low", "magnitude": 0.18},
+    {"feature": "s3", "direction": "high", "magnitude": 0.15}
+  ],
+  "root_cause": "高压压气机叶片结垢",
+  "cause_category": "degradation",
+  "synthetic": true,
+  "evidence_level": "seed",
+  "mechanism": "叶片结垢导致压气机效率下降，需增加燃油维持推力，排气温度（T50/s4）上升，压比（epr/s10）下降。传感器编号已按 NASA CMAPSS 对齐（原 docs 示意 s11/s14/s15）。",
+  "verification": "孔探检查确认第3-5级叶片结垢（示例案例）",
+  "action_taken": "水洗压气机，恢复性能",
+  "outcome": "成功，s4/s12/s10 恢复正常",
+  "report_ref": "obs://bucket/reports/case-cfm56-hpc-fouling-seed.pdf"
+}

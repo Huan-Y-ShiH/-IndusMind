@@ -1,0 +1,8 @@
+{
+  "chunk_id": "manual-cmapss-saxena-sensors",
+  "device_model": "CMAPSS-Turbofan",
+  "section": "3. 传感器与健康参数定义",
+  "content": "C-MAPSS 通过燃油流量及 13 个健康参数输入，可在 Fan、LPC、HPC、HPT、LPT 五个旋转部件上注入故障与性能退化。健康参数包括各部件的 efficiency modifier、flow modifier 与 pressure-ratio modifier。挑战数据向参赛者提供的传感器输出包括：T2、T24、T30、T50、P2、P15、P30、Nf、Nc、epr、Ps30、phi、NRf、NRc、BPR、farB、htBleed、Nf_dmd、PCNfR_dmd、W31、W32。其中 T50（低压涡轮出口总温）是排气温度/EGT 的关键代理量；phi 表征燃油流量相对 Ps30 的比例，常随效率下降而升高。",
+  "page": 2,
+  "source": "file://knowledge/sources/fmea_cmapss_rag/NASA_Saxena_2008_CMAPSS_DamagePropagation.pdf"
+}

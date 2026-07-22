@@ -1,0 +1,29 @@
+source,dataset,fault_mode,component,health_param_effect,sensor_id,sensor_symbol,sensor_name,expected_direction,confidence,notes
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s2,T24,Total temperature at LPC outlet,increase,medium,Gas-path degradation typically raises interstage temps; confirmed as trending sensor in FD001 literature
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s3,T30,Total temperature at HPC outlet,increase,high,HPC efficiency loss → higher discharge temperature
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s4,T50,Total temperature at LPT outlet (EGT proxy),increase,high,EGT rise is classic HPC health symptom; used in health index margins
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s7,P30,Total pressure at HPC outlet,decrease,medium,Reduced compressor performance lowers P30 for similar operating point; controller may compensate
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s9,Nc,Physical core speed,increase,medium,Controller often raises fuel/speed to hold thrust → Nc up
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s11,Ps30,Static pressure at HPC outlet,increase,medium,Often rises with fuel schedule compensation in closed-loop CMAPSS
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s12,phi,Ratio of fuel flow to Ps30,increase,high,More fuel needed for same thrust as efficiency drops
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s14,NRc,Corrected core speed,increase,medium,Tracks core speed correction under degradation
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s15,BPR,Bypass Ratio,decrease,low,Secondary effect via core/fan matching
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s17,htBleed,Bleed Enthalpy,increase,medium,Trending channel in FD001 public analyses
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s20,W31,HPT coolant bleed,increase,medium,Cooling flow schedule often rises with hotter gas path
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD001,HPC_Degradation,HPC,"efficiency↓ + flow↓",s21,W32,LPT coolant bleed,increase,medium,Cooling flow schedule often rises with hotter gas path
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD003,Fan_Degradation,Fan,"efficiency↓ + flow↓",s2,T24,Total temperature at LPC outlet,increase,medium,Fan degradation alters overall matching and LPC inlet conditions
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD003,Fan_Degradation,Fan,"efficiency↓ + flow↓",s8,Nf,Physical fan speed,increase_or_abnormal,medium,Fan health modifiers primarily affect fan speed / bypass matching
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD003,Fan_Degradation,Fan,"efficiency↓ + flow↓",s13,NRf,Corrected fan speed,increase_or_abnormal,medium,Corrected fan speed tracks fan module health
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD003,Fan_Degradation,Fan,"efficiency↓ + flow↓",s15,BPR,Bypass Ratio,decrease,medium,Fan flow loss typically reduces bypass ratio
+NASA_Saxena_2008+CMAPSS_readme,CMAPSS_FD003,Fan_Degradation,Fan,"efficiency↓ + flow↓",s4,T50,Total temperature at LPT outlet,increase,medium,Thrust hold → higher fuel → hotter EGT
+NASA_Chao_2021_N-CMAPSS,N-CMAPSS_DS01,HPT_Efficiency_Loss,HPT,efficiency↓,xs_T50,T50,LPT outlet / EGT-related,increase,high,N-CMAPSS DS01 implants HPT efficiency fault class
+NASA_Chao_2021_N-CMAPSS,N-CMAPSS_DS02,"HPT_eff + LPT_eff + LPT_flow",HPT+LPT,"HPT_E↓; LPT_E↓; LPT_FΔ",xs_T50,T50,Turbine exit temperature,increase,high,DS02 multi-component turbine degradation
+NASA_Chao_2021_N-CMAPSS,N-CMAPSS_DS02,"HPT_eff + LPT_eff + LPT_flow",HPT+LPT,"HPT_E↓; LPT_E↓; LPT_FΔ",xs_Nf,Nf,Fan speed,abnormal,medium,Multi-module coupling under closed-loop control
+NASA_Chao_2021_N-CMAPSS,N-CMAPSS_DS02,"HPT_eff + LPT_eff + LPT_flow",HPT+LPT,"HPT_E↓; LPT_E↓; LPT_FΔ",xs_Nc,Nc,Core speed,abnormal,medium,Multi-module coupling under closed-loop control
+NASA_Saxena_2008,CMAPSS_generic,Module_Flow_Efficiency_Loss,Fan/LPC/HPC/HPT/LPT,"flow and/or efficiency modifiers",ALL_RESPONSE_SURFACE,see_paper_Fig3_Fig4,Sensor response surfaces vs flow&efficiency,see_response_surface,high,Paper generates response surfaces of ALL sensors vs module flow/efficiency — strongest official NASA source for signature shape
+SKF_Bearing_handbook,Rotating_machinery,Lubrication_failure,Bearing,lubrication_starvation_or_wrong_grease,vib,Vibration,Vibration amplitude / envelope,increase,high,SKF: grinding noise and rising vibration precede failure
+SKF_Bearing_handbook,Rotating_machinery,Lubrication_failure,Bearing,lubrication_starvation_or_wrong_grease,temp,Temperature,Bearing housing temperature,increase,high,SKF Table1a: excessive heat symptom
+SKF_Bearing_handbook,Rotating_machinery,Contamination,Bearing,particle_or_water_ingress,vib,Vibration,Vibration level,increase,high,Common seed for spalling → vibration rise
+SKF_Bearing_handbook,Rotating_machinery,Fatigue_spalling,Bearing,subsurface_initiated_fatigue,vib,Vibration,High-frequency / BPFO-BPFI bands,increase,high,Classic rolling-element fault signature
+SKF_Bearing_handbook,Rotating_machinery,Misalignment,Shaft-Bearing,angular_or_parallel_misalignment,vib,Vibration,1x/2x running speed harmonics,increase,high,SKF symptom C excessive vibration
+WJAETS_2023_Taurus60,Industrial_GT,Compressor_rotor_assembly_failure,Compressor,wear_imbalance_blade_issues,N/A,inspection_checklist,FMEA lists failure modes/effects/RPN,detection_via_inspection,medium,Traditional FMEA with RPN; limited explicit sensor up/down columns

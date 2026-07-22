@@ -1,0 +1,19 @@
+{
+  "ticket_id": "WO-2025-03-22-0042",
+  "device_id": "engine-A-07",
+  "device_model": "CFM56-7B",
+  "fault_category": "压气机结垢",
+  "actions": [
+    "对比同工况基线：s4/s12/s10",
+    "孔探确认 HPC 3-5 级结垢",
+    "离线压气机水洗",
+    "试车验证 EGT/燃油与压比恢复"
+  ],
+  "duration_hours": 6.5,
+  "cost": 12500,
+  "outcome": "resolved",
+  "linked_case_id": "case-cfm56-hpc-fouling-seed",
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "compressor fouling/washing literature (Cranfield/ASME) + project seed case"
+}

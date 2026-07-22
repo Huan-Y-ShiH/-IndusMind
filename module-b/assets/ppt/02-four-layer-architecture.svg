@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0 12 6 0 12Z" fill="#397e8c"/>
+    </marker>
+    <style>
+      .title{font:700 40px Arial,sans-serif;fill:#102d3d}.sub{font:400 20px Arial,sans-serif;fill:#5f7480}
+      .h{font:700 27px Arial,sans-serif;fill:#fff}.t{font:400 19px Arial,sans-serif;fill:#193b4a}
+      .small{font:400 17px Arial,sans-serif;fill:#526c77}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#f4f7f8"/>
+  <text x="90" y="82" class="title">IndusMind Four-Layer Diagnostic Architecture</text>
+  <text x="90" y="118" class="sub">Deterministic Flow | Evidence-grounded RAG | Constrained LLM | Human Review</text>
+  <g stroke="#397e8c" stroke-width="4" fill="none" marker-end="url(#arrow)">
+    <path d="M355 385H455"/><path d="M735 385H835"/><path d="M1115 385H1215"/>
+  </g>
+  <g>
+    <rect x="75" y="240" width="280" height="290" rx="22" fill="#17485e"/>
+    <text x="215" y="298" text-anchor="middle" class="h">01 MONITOR</text>
+    <rect x="104" y="334" width="222" height="55" rx="12" fill="#fff"/><text x="215" y="368" text-anchor="middle" class="t">Normalize Event</text>
+    <rect x="104" y="408" width="222" height="55" rx="12" fill="#fff"/><text x="215" y="442" text-anchor="middle" class="t">RUL + Attribution</text>
+    <text x="215" y="498" text-anchor="middle" class="small" fill="#d5e9ee">AnomalyEvent</text>
+  </g>
+  <g>
+    <rect x="455" y="190" width="280" height="390" rx="22" fill="#286f7d"/>
+    <text x="595" y="248" text-anchor="middle" class="h">02 DIAGNOSE</text>
+    <rect x="484" y="284" width="222" height="55" rx="12" fill="#fff"/><text x="595" y="318" text-anchor="middle" class="t">Hybrid RAG</text>
+    <rect x="484" y="358" width="222" height="55" rx="12" fill="#fff"/><text x="595" y="392" text-anchor="middle" class="t">L1 Re-ranking</text>
+    <rect x="484" y="432" width="222" height="55" rx="12" fill="#fff"/><text x="595" y="466" text-anchor="middle" class="t">L2/L3 Expert Crew</text>
+    <rect x="484" y="506" width="222" height="44" rx="12" fill="#f29c46"/><text x="595" y="535" text-anchor="middle" class="t" fill="#fff">Confidence Gate</text>
+  </g>
+  <g>
+    <rect x="835" y="240" width="280" height="290" rx="22" fill="#3f8791"/>
+    <text x="975" y="298" text-anchor="middle" class="h">03 DECIDE</text>
+    <rect x="864" y="334" width="222" height="55" rx="12" fill="#fff"/><text x="975" y="368" text-anchor="middle" class="t">Match Tickets</text>
+    <rect x="864" y="408" width="222" height="55" rx="12" fill="#fff"/><text x="975" y="442" text-anchor="middle" class="t">Actions + Urgency</text>
+    <text x="975" y="498" text-anchor="middle" class="small" fill="#e5f2f4">Decision</text>
+  </g>
+  <g>
+    <rect x="1215" y="240" width="280" height="290" rx="22" fill="#526f7b"/>
+    <text x="1355" y="298" text-anchor="middle" class="h">04 REPORT</text>
+    <rect x="1244" y="334" width="222" height="55" rx="12" fill="#fff"/><text x="1355" y="368" text-anchor="middle" class="t">Structured Result</text>
+    <rect x="1244" y="408" width="222" height="55" rx="12" fill="#fff"/><text x="1355" y="442" text-anchor="middle" class="t">Markdown + Notify</text>
+    <text x="1355" y="498" text-anchor="middle" class="small" fill="#e7edef">DiagnosticReport</text>
+  </g>
+  <path d="M595 580V675H845" fill="none" stroke="#f29c46" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="845" y="630" width="390" height="92" rx="18" fill="#fff" stroke="#f29c46" stroke-width="3"/>
+  <text x="1040" y="670" text-anchor="middle" class="t">LOW CONFIDENCE</text>
+  <text x="1040" y="700" text-anchor="middle" class="small">Report | Monitor | Human Review</text>
+  <g transform="translate(90 785)">
+    <circle cx="8" cy="0" r="8" fill="#286f7d"/><text x="28" y="7" class="small">High confidence: proceed to decision and report</text>
+    <circle cx="590" cy="0" r="8" fill="#f29c46"/><text x="610" y="7" class="small">Low confidence: no automatic maintenance</text>
+  </g>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "ticket_id": "WO-2024-11-08-0007",
+  "device_id": "engine-CMAPSS-001",
+  "device_model": "CMAPSS-Turbofan",
+  "fault_category": "轴承润滑失效",
+  "actions": [
+    "记录振动/温度/噪声基线对比",
+    "检查供油压力与回油温度",
+    "油液取样（磨粒/污染度）",
+    "更换润滑剂与滤芯",
+    "试车监测轴承温度与振动包络"
+  ],
+  "duration_hours": 5.0,
+  "cost": 8200,
+  "outcome": "resolved",
+  "linked_case_id": null,
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "SKF Bearing damage and failure analysis (noise/temp/vibration monitoring)"
+}

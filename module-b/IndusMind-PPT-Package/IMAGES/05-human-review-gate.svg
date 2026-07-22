@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="m" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 12 6 0 12Z" fill="#397e8c"/></marker>
+    <style>
+      .title{font:700 40px Arial,sans-serif;fill:#102d3d}.sub{font:400 20px Arial,sans-serif;fill:#607580}
+      .h{font:700 27px Arial,sans-serif;fill:#173846}.t{font:400 19px Arial,sans-serif;fill:#526c77}.w{fill:#fff}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#f4f7f8"/>
+  <text x="80" y="80" class="title">Confidence Gate and Human-in-the-loop Safety</text>
+  <text x="80" y="118" class="sub">Low-confidence results are reported for human review, never used for automatic maintenance</text>
+  <rect x="80" y="245" width="315" height="300" rx="28" fill="#173f55"/>
+  <circle cx="237" cy="350" r="74" fill="#fff"/>
+  <path d="M195 355 225 385 282 320" fill="none" stroke="#397e8c" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="237" y="475" text-anchor="middle" class="h w">L1 + RAG EVIDENCE</text>
+  <path d="M395 395H570" fill="none" stroke="#397e8c" stroke-width="5" marker-end="url(#m)"/>
+  <g transform="translate(700 395)">
+    <path d="M0-150 145-75V45C145 140 70 195 0 225-70 195-145 140-145 45V-75Z" fill="#fff" stroke="#f29c46" stroke-width="8"/>
+    <circle r="72" fill="#173f55"/>
+    <path d="M-35 12A55 55 0 1 1 45 23" fill="none" stroke="#fff" stroke-width="12"/>
+    <path d="M0 0 34-38" stroke="#f29c46" stroke-width="10" stroke-linecap="round"/><circle r="10" fill="#f29c46"/>
+    <text x="0" y="275" text-anchor="middle" class="h">CONFIDENCE GATE</text>
+    <text x="0" y="310" text-anchor="middle" class="t">Confidence &gt; 0.8</text>
+    <text x="0" y="340" text-anchor="middle" class="t">RAG support &gt;= 0.5</text>
+  </g>
+  <path d="M845 330C970 240 1055 235 1160 270" fill="none" stroke="#397e8c" stroke-width="5" marker-end="url(#m)"/>
+  <path d="M845 465C970 570 1055 590 1160 565" fill="none" stroke="#f29c46" stroke-width="5" marker-end="url(#m)"/>
+  <g>
+    <rect x="1160" y="180" width="360" height="250" rx="28" fill="#347f8c"/>
+    <circle cx="1210" cy="265" r="30" fill="#fff"/><path d="M1195 266 1208 279 1230 251" fill="none" stroke="#347f8c" stroke-width="7"/>
+    <text x="1365" y="265" text-anchor="middle" class="h w">HIGH CONFIDENCE</text>
+    <text x="1365" y="315" text-anchor="middle" class="t w">L2/L3 expert refinement</text>
+    <text x="1365" y="348" text-anchor="middle" class="t w">Decision | Report | Action</text>
+  </g>
+  <g>
+    <rect x="1160" y="500" width="360" height="250" rx="28" fill="#fff" stroke="#f29c46" stroke-width="5"/>
+    <circle cx="1210" cy="585" r="30" fill="#f29c46"/><path d="M1210 567V590M1210 603V607" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+    <text x="1365" y="585" text-anchor="middle" class="h">LOW CONFIDENCE</text>
+    <text x="1365" y="635" text-anchor="middle" class="t">Monitor | Report | Review</text>
+    <text x="1365" y="668" text-anchor="middle" class="t">No automatic maintenance</text>
+  </g>
+  <rect x="80" y="675" width="760" height="105" rx="20" fill="#e7f0f2"/>
+  <text x="115" y="720" class="h">PRODUCTION PRINCIPLE</text>
+  <text x="115" y="758" class="t">Always-Top-1 mode is for integration demos only; keep it disabled in production.</text>
+</svg>

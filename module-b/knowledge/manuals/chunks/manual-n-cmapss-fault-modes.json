@@ -1,0 +1,8 @@
+{
+  "chunk_id": "manual-n-cmapss-fault-modes",
+  "device_model": "CMAPSS-Turbofan",
+  "section": "2. N-CMAPSS 失效模式组合",
+  "content": "N-CMAPSS 在真实飞行条件包线下生成 run-to-failure 轨迹，并提供故障类别标签。失效作用于旋转子部件的流量(F)与/或效率(E)。例如 DS01 侧重 HPT 效率故障；DS02 同时包含 HPT 效率、LPT 效率与 LPT 流量退化；DS08 覆盖全部五部件的 E/F 组合。除 RUL 外，数据还包含健康状态 hs 与故障类，可用于诊断。传感器侧提供场景描述量 w 与测量量 xs，并叠加约 65 dB SNR 的测量噪声。",
+  "page": 5,
+  "source": "file://knowledge/sources/fmea_cmapss_rag/MDPI_Chao_2021_N-CMAPSS_Dataset.pdf"
+}

@@ -1,0 +1,31 @@
+device_model,failure_mode,effect,symptom_signature,severity,occurrence,detection,risk_priority,source,notes
+CMAPSS-Turbofan,高压压气机效率/流量退化,HPC 做功能力下降、需加燃油保推力,"s3↑;s4↑;s12↑;s9↑;s14↑;s15↓",9,7,4,252,NASA_Saxena_2008+CMAPSS_FD001,主故障模式 FD001/FD002；T30/T50/phi/Nc 典型上升
+CMAPSS-Turbofan,高压压气机叶片结垢,压气机效率下降、压比能力变差,"s4↑;s12↑;s7↓;s3↑;s15↓",8,5,4,160,NASA_Saxena_2008+gas_path_physics,语义对齐 docs 结垢案例；NASA 编号：T50↑ phi↑ P30↓
+CMAPSS-Turbofan,风扇效率/流量退化,风扇模块性能下降、涵道匹配恶化,"s8↑;s13↑;s15↓;s4↑;s2↑",8,4,5,160,NASA_Saxena_2008+CMAPSS_FD003,FD003/FD004 附加故障；Nf/NRf/BPR 敏感
+CMAPSS-Turbofan,高压压气机退化叠加风扇退化,HPC 与 Fan 同时发生 flow/efficiency 劣化,"s3↑;s4↑;s8↑;s12↑;s13↑;s15↓",9,4,5,180,NASA_Saxena_2008+CMAPSS_FD003,FD003/FD004 组合故障；与案例 taxonomy 对齐
+CMAPSS-Turbofan,低压压气机效率/流量退化,LPC 温升与匹配变化,"s2↑;s3↑;s4↑;s12↑",7,4,5,140,NASA_Saxena_2008+N-CMAPSS,LPC_eff/flow 健康参数注入
+CMAPSS-Turbofan,高压涡轮效率下降,涡轮做功不足、排气温度升高,"s4↑;s12↑;s9↑;s20↑",9,3,5,135,NASA_Chao_2021_N-CMAPSS_DS01,N-CMAPSS DS01 典型 HPT_E
+CMAPSS-Turbofan,低压涡轮效率/流量退化,LPT 热端与转速匹配异常,"s4↑;s9↑;s21↑;s8↑",8,3,5,120,NASA_Chao_2021_N-CMAPSS_DS02,DS02：HPT_E+LPT_E+LPT_F 组合退化
+CMAPSS-Turbofan,多模块气路综合退化,多部件 flow/efficiency 同时劣化,"s3↑;s4↑;s12↑;s14↑;s17↑;s20↑;s21↑",9,4,4,144,NASA_Saxena_2008_response_surface,对应 response surface 全局热端上漂
+CMAPSS-Turbofan,燃烧室燃油雾化不良/喷嘴堵塞,燃烧效率下降、需更多燃油,"s4↑;s12↑;s16↑;s3↑",7,3,5,105,gas_path_physics+docs_analogy,公开 CMAPSS 未单独植入；按气路机理推断
+CMAPSS-Turbofan,涡轮叶片烧蚀/冷却失效,涡轮效率下降、冷却引气异常,"s4↑;s20↓;s21↓;s13↓",9,2,6,108,gas_path_physics+docs_analogy,冷却流量异常下降 + EGT 上升
+CMAPSS-Turbofan,高压压气机喘振裕度侵蚀,逼近喘振、热端与转速波动,"s3↑;s4↑;s9↑;s11↑;s7↓",9,3,4,108,NASA_Saxena_2008_health_index,健康指数含 HPC stall margin
+CMAPSS-Turbofan,轴承润滑失效,摩擦热与振动上升（旋转机械兜底）,"vib↑;temp↑",8,4,3,96,SKF_Bearing_failure_handbook,非气路传感器；外挂振动/温度通道
+CMAPSS-Turbofan,轴承疲劳剥落,特征频率振动升高,"vib↑",7,3,4,84,SKF_Bearing_failure_handbook,BPFO/BPFI 频带升高
+CMAPSS-Turbofan,轴系不对中,1x/2x 振动升高,"vib↑",6,4,4,96,SKF_Bearing_failure_handbook,SKF 症状 C
+TAURUS-60,压气机转子组件失效,振动/不平衡/叶片损伤导致性能下降,"vib↑;temp↑",8,4,5,160,WJAETS_2023_Taurus60_FMEA,工业燃机 FMEA；检测偏检查清单
+TAURUS-60,齿轮箱失效,传动异常、振动噪声升高,"vib↑",7,4,4,112,WJAETS_2023_Taurus60_FMEA,RPN 区间参考原文
+TAURUS-60,燃油喷嘴故障,燃烧不均、排气温度场异常,"s4↑;temp↑",7,3,5,105,WJAETS_2023_Taurus60_FMEA,映射到 EGT/温度通道
+CFM56-7B,压气机叶片结垢,压气机效率下降,"s4↑;s12↑;s10↓",8,5,4,160,docs_rag-system_seed+NASA_remap,保留型号别名；签名已从 docs 示意编号 remap 到 NASA
+CFM56-7B,燃烧室喷嘴堵塞,燃油雾化不良,"s4↑;s12↑;s16↑",7,3,5,105,docs_rag-system_seed+NASA_remap,原 docs: s11↑;s14↑;s15↑ → NASA s4/s12/s16
+CFM56-7B,涡轮叶片烧蚀,涡轮效率下降,"s4↑;s13↓;s20↓",9,2,6,108,docs_rag-system_seed+NASA_remap,原 docs: s11↑;s13↓;s20↓ → EGT 用 s4
+CMAPSS-Turbofan,压气机叶型侵蚀/粗糙度增大,气动效率下降、喘振裕度收窄、热端补偿升温,"s3↑;s4↑;s12↑;s7↓;s11↑",8,4,5,160,aeroenginesafety_erosion+gas_path_physics,侵蚀使压气机效率变差需提燃气温度保推力；见 Graz Aeroengine Safety 5.3.2
+CMAPSS-Turbofan,热端冷却孔/冷却通道堵塞,冷却失效→局部过热与效率损失,"s4↑;s20↓;s21↓;s17↑",9,3,5,135,aeroenginesafety_erosion+cooling_blockage,粉尘/焦炭堵塞冷却孔会抬高叶片温度并缩短寿命
+CMAPSS-Turbofan,风扇外物损伤(FOD),风扇气动外形破坏、涵道匹配恶化,"s8↑;s13↑;s15↓;s2↑;vib↑",8,3,4,96,gas_path_physics+CMAPSS_fan_signature,非官方 CMAPSS 植入故障；按风扇损伤机理推断
+CMAPSS-Turbofan,进气道/空气滤清器堵塞,进气损失、功率下降、热端与燃油补偿上升,"s2↑;s4↑;s12↑;s8↓",7,5,3,105,WJAETS_2023_Taurus60_FMEA,Taurus60 关键组件 air filter package；映射到气路传感器
+CMAPSS-Turbofan,燃油喷嘴/喷油器故障,燃烧不均、局部热点、EGT 与燃油相关通道异常,"s4↑;s12↑;s16↑;s3↑",8,4,4,128,WJAETS_2023_Taurus60_FMEA+fuel_injector,Taurus60 关键组件 fuel injector（RPN 约 90-120）
+CMAPSS-Turbofan,燃油气路供气异常,供油/燃气压力不稳导致燃烧与转速波动,"s4↑;s12↑;s9↑;s16↑",7,3,4,84,WJAETS_2023_Taurus60_FMEA,Taurus60 关键组件 fuel gas supply
+TAURUS-60,空气滤清器组件失效,进气过滤失效/堵塞导致性能下降与下游污染,"vib↑;temp↑;s4↑",7,5,3,105,WJAETS_2023_Taurus60_FMEA,criticality 高；维护以巡检/更换滤芯为主
+TAURUS-60,燃油喷射器失效,燃烧不均与排气温度异常,"s4↑;temp↑",8,4,4,128,WJAETS_2023_Taurus60_FMEA,原文 RPN 区间约 90-120
+CMAPSS-Turbofan,滑油系统污染/供油不足,轴承热与振动上升、二次损伤风险,"vib↑;temp↑",8,4,3,96,SKF_Bearing_failure_handbook,SKF：噪声/温度/振动是早期征兆；污染与润滑不足为高频根因
+CMAPSS-Turbofan,N-CMAPSS多工况HPC退化,多操作点下 HPC 效率/流量劣化,"s3↑;s4↑;s12↑;s9↑;s14↑",9,6,4,216,NASA_CMAPSS_FD002,FD002：6 工况 + HPC Degradation（NASA Open Data）

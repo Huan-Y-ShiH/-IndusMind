@@ -1,0 +1,11 @@
+{
+  "ticket_id": "WO-2008-10-01-0001",
+  "device_id": "engine-CMAPSS-001",
+  "device_model": "CMAPSS-Turbofan",
+  "fault_category": "压气机退化",
+  "actions": ["趋势复核 s3/s4/s12", "孔探评估 HPC", "压气机水洗", "试车/性能点验证"],
+  "duration_hours": 6.5,
+  "cost": 12500,
+  "outcome": "resolved",
+  "linked_case_id": "case-cmapss-fd001-hpc-seed"
+}

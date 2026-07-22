@@ -1,0 +1,10 @@
+# Project path defaults (relative to repo root)
+knowledge_root: knowledge
+fmea_csv: knowledge/fmea/CMAPSS-Turbofan-fmea.csv
+fmea_l2: knowledge/fmea/CMAPSS-Turbofan-fmea-l2.json
+cases_dir: knowledge/cases
+manual_chunks_dir: knowledge/manuals/chunks
+feature_meta: knowledge/model_meta/cmapss-feature-definitions.json
+tickets_dir: knowledge/tickets
+source_pdfs: knowledge/sources/fmea_cmapss_rag
+signature_map: knowledge/sources/fmea_cmapss_rag/CMAPSS_fault_sensor_signature_map.csv

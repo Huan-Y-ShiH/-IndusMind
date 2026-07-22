@@ -1,0 +1,19 @@
+{
+  "ticket_id": "WO-2021-06-15-0011",
+  "device_id": "engine-CMAPSS-001",
+  "device_model": "CMAPSS-Turbofan",
+  "fault_category": "高压涡轮效率下降",
+  "actions": [
+    "热端孔探（HPT 叶片/导向器）",
+    "检查冷却孔与冷却引气通道",
+    "复核 s4/s12/s20 趋势",
+    "视情安排热端部件更换或修理"
+  ],
+  "duration_hours": 12.0,
+  "cost": 48000,
+  "outcome": "partial",
+  "linked_case_id": null,
+  "synthetic": true,
+  "evidence_level": "seed",
+  "source": "N-CMAPSS HPT efficiency fault class + Aeroengine Safety cooling/erosion notes"
+}

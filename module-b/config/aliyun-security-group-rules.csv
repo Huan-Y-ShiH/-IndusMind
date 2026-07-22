@@ -1,0 +1,3 @@
+Direction,Policy,Priority,IpProtocol,PortRange,SourceCidrIp,Ipv6SourceCidrIp,SourceGroupId,SourcePrefixListId,SourcePortRange,NicType,Description,DestCidrIp,Ipv6DestCidrIp,DestGroupId,DestPrefixListId,SourceGroupOwnerAccount,SourceGroupOwnerId,DestGroupOwnerAccount,DestGroupOwnerId,PortRangeListId
+ingress,Accept,1,TCP,443/443,0.0.0.0/0,,,,,intranet,IndusMind FRP TLS control,,,,,,,,,
+ingress,Accept,1,TCP,80/80,0.0.0.0/0,,,,,intranet,IndusMind Agent HTTP API,,,,,,,,,
