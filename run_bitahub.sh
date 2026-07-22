@@ -11,7 +11,7 @@ export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 export PYTHONUNBUFFERED=1
 
 echo "=================================================="
-echo " IndusMind RUL Training (Bitahub)"
+echo " IndusMind Monitor v2 Training (Bitahub)"
 echo "=================================================="
 "$PYTHON" - <<'PY'
 import torch, sys
@@ -31,13 +31,13 @@ exec "$PYTHON" train.py \
   --data-path "$DATA_PATH" \
   --output "$OUTPUT" \
   --device cuda \
-  --epochs "${EPOCHS:-150}" \
-  --batch-size "${BATCH_SIZE:-256}" \
-  --lr "${LR:-0.001}" \
-  --patience "${PATIENCE:-25}" \
-  --dropout "${DROPOUT:-0.3}" \
-  --max-rul 0 \
+  --epochs "${EPOCHS:-60}" \
+  --warmup-epochs "${WARMUP_EPOCHS:-3}" \
+  --batch-size "${BATCH_SIZE:-512}" \
+  --lr "${LR:-0.0003}" \
+  --patience "${PATIENCE:-12}" \
+  --dropout "${DROPOUT:-0.25}" \
   --weight-decay "${WEIGHT_DECAY:-0.0001}" \
   --num-workers "${NUM_WORKERS:-4}" \
-  --lstm-hidden 128 \
-  --lstm-layers 2
+  --svdd-weight "${SVDD_WEIGHT:-0.05}" \
+  --degradation-weight "${DEGRADATION_WEIGHT:-0.02}"

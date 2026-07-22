@@ -1,5 +1,5 @@
 """
-ModelArts Launcher - IndusMind RUL Training on Tesla V100
+ModelArts Launcher - IndusMind Monitor v2 on Tesla V100
 
 Boot:
   python launcher.py
@@ -19,20 +19,20 @@ sys.argv = [
     "--data-path", "/home/ma-user/modelarts/inputs/data_url_0",
     "--output", "/home/ma-user/modelarts/outputs/train_url_0",
     "--device", "cuda",
-    "--epochs", "150",
+    "--epochs", "60",
+    "--warmup-epochs", "3",
     "--batch-size", "256",
-    "--lr", "0.001",
-    "--patience", "25",
-    "--dropout", "0.3",
-    "--max-rul", "0",
+    "--lr", "0.0003",
+    "--patience", "12",
+    "--dropout", "0.25",
     "--weight-decay", "0.0001",
     "--num-workers", "4",
-    "--lstm-hidden", "128",
-    "--lstm-layers", "2",
+    "--svdd-weight", "0.05",
+    "--degradation-weight", "0.02",
 ]
 
 print("=" * 50)
-print(" IndusMind RUL Training (ModelArts / V100)")
+print(" IndusMind Monitor v2 Training (ModelArts / V100)")
 print("=" * 50)
 import torch
 
