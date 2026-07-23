@@ -1,0 +1,277 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── 暗夜工控（NASA 控制中心风格）CSS Variables ────────────────────── */
+:root {
+  /* 底色系 */
+  --bg-base: #0a0e14;           /* 最深底色 */
+  --bg-panel: #111620;          /* 面板/卡片底色 */
+  --bg-elevated: #161c26;       /* 悬浮层底色 */
+  --bg-header: #0d1117;         /* 顶栏，比base稍亮 */
+  --bg-sidebar: #0c1016;        /* 侧边栏 */
+
+  /* 霓虹绿系 — 数据主色 */
+  --accent-primary: #00e676;    /* 主数据色霓虹绿 */
+  --accent-dim: #00c853;        /* 暗绿，次要数据 */
+  --accent-glow: rgba(0, 230, 118, 0.15); /* 发光效果 */
+
+  /* 状态色 */
+  --status-normal: #00e676;     /* 正常运行 */
+  --status-warning: #ff9800;    /* 警告 */
+  --status-danger: #ff1744;     /* 危险/告警 */
+  --status-offline: #546e7a;    /* 离线/停机 */
+
+  /* 文字色 */
+  --text-primary: #e0e0e0;      /* 主文字 */
+  --text-secondary: #90a4ae;    /* 次要文字/标签 */
+  --text-dim: #546e7a;          /* 极暗文字 */
+
+  /* 边框/分割线 */
+  --border-subtle: #1a2332;     /* 暗分割线 */
+  --border-panel: #263040;      /* 面板边框 */
+
+  /* 字号 */
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* ── Scrollbar (Dark Thin) ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-panel);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+/* ── Alert Pulse Animation ───────────────────────────────────────── */
+@keyframes alert-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1.0; }
+}
+
+.alert-pulse {
+  animation: alert-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Farm Alert Flash (left border pulse) ─────────────────────────── */
+@keyframes farm-alert-flash {
+  0%, 100% { border-left-color: var(--status-danger); }
+  50%      { border-left-color: rgba(255, 23, 68, 0.25); }
+}
+
+/* ── Ant Design Dark Overrides ────────────────────────────────────── */
+/* Override Ant Design component styles for dark theme */
+.ant-card {
+  background-color: var(--bg-panel) !important;
+  border: 1px solid var(--border-panel) !important;
+  border-radius: 2px !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-card-head {
+  background-color: var(--bg-elevated) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+}
+
+.ant-card-body {
+  background-color: var(--bg-panel) !important;
+}
+
+.ant-statistic-title {
+  color: var(--text-secondary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ant-statistic-content {
+  font-family: var(--font-mono) !important;
+}
+
+.ant-table {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-table-thead > tr > th {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background-color: var(--bg-elevated) !important;
+}
+
+.ant-tag {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  border-radius: 2px !important;
+}
+
+.ant-btn {
+  border-radius: 2px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+}
+
+.ant-btn-primary {
+  background-color: var(--accent-dim) !important;
+  border-color: var(--accent-dim) !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.ant-input, .ant-input-password {
+  background-color: var(--bg-base) !important;
+  border: 1px solid var(--border-panel) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.ant-input:focus, .ant-input-password:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px var(--accent-glow) !important;
+}
+
+.ant-select-selector {
+  background-color: var(--bg-base) !important;
+  border: 1px solid var(--border-panel) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-modal-content {
+  background-color: var(--bg-panel) !important;
+  border: 1px solid var(--border-panel) !important;
+  border-radius: 2px !important;
+}
+
+.ant-modal-header {
+  background-color: var(--bg-elevated) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.ant-modal-title {
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.ant-descriptions-item-label {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+}
+
+.ant-descriptions-item-content {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-divider {
+  border-color: var(--border-subtle) !important;
+}
+
+.ant-divider-plain .ant-divider-inner-text {
+  color: var(--text-secondary) !important;
+}
+
+.ant-form-item-label > label {
+  color: var(--text-secondary) !important;
+}
+
+.ant-switch {
+  background-color: var(--border-panel) !important;
+}
+
+.ant-switch-checked {
+  background-color: var(--accent-primary) !important;
+}
+
+.ant-message-notice-content {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-pagination-item {
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-panel) !important;
+}
+
+.ant-pagination-item a {
+  color: var(--text-secondary) !important;
+}
+
+.ant-pagination-item-active {
+  border-color: var(--accent-primary) !important;
+}
+
+.ant-pagination-item-active a {
+  color: var(--accent-primary) !important;
+}
+
+.ant-list-item {
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.ant-empty-description {
+  color: var(--text-dim) !important;
+}
+
+.ant-descriptions-item-container .ant-descriptions-item-label,
+.ant-descriptions-item-container .ant-descriptions-item-content {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+}
+
+/* Table row selection — white bg → dark text for readability */
+.alert-row-selected .ant-table-cell {
+  color: #000 !important;
+}
+.alert-row-selected .ant-table-cell-row-hover {
+  background: #f0f0f0 !important;
+}

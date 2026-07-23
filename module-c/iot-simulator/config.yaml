@@ -1,0 +1,99 @@
+# IoT Simulator Configuration
+# 200 wind turbines across 4 wind farms, 50 per farm
+
+devices:
+  # ── Farm A: 东海风场 (Donghai) ──
+  - id: "WT-001"
+    name: "东海风场 1号风机"
+    farm: "东海风场"
+    model: "GW-2000"
+  - id: "WT-002"
+    name: "东海风场 2号风机"
+    farm: "东海风场"
+    model: "GW-2000"
+  - id: "WT-003"
+    name: "东海风场 3号风机"
+    farm: "东海风场"
+    model: "GW-1500"
+  - id: "WT-004"
+    name: "东海风场 4号风机"
+    farm: "东海风场"
+    model: "GW-2000"
+  - id: "WT-005"
+    name: "东海风场 5号风机"
+    farm: "东海风场"
+    model: "SE-3000"
+  # ... (remaining WT-006 ~ WT-050 in real deployment)
+  # Expand using script: for i in {6..50}; do echo "- id: WT-$(printf %03d $i)" >> config.yaml; done
+
+  # ── Farm B: 西北风场 (Xibei) ──
+  - id: "WT-051"
+    name: "西北风场 1号风机"
+    farm: "西北风场"
+    model: "EN-2500"
+  - id: "WT-052"
+    name: "西北风场 2号风机"
+    farm: "西北风场"
+    model: "EN-2500"
+  - id: "WT-053"
+    name: "西北风场 3号风机"
+    farm: "西北风场"
+    model: "GW-1500"
+  - id: "WT-054"
+    name: "西北风场 4号风机"
+    farm: "西北风场"
+    model: "GW-2000"
+  - id: "WT-055"
+    name: "西北风场 5号风机"
+    farm: "西北风场"
+    model: "SE-3000"
+  # ... (WT-056 ~ WT-100)
+
+  # ── Farm C: 江南风场 (Jiangnan) ──
+  - id: "WT-101"
+    name: "江南风场 1号风机"
+    farm: "江南风场"
+    model: "SE-3000"
+  - id: "WT-102"
+    name: "江南风场 2号风机"
+    farm: "江南风场"
+    model: "GW-2000"
+  - id: "WT-103"
+    name: "江南风场 3号风机"
+    farm: "江南风场"
+    model: "GW-1500"
+  - id: "WT-104"
+    name: "江南风场 4号风机"
+    farm: "江南风场"
+    model: "EN-2500"
+  - id: "WT-105"
+    name: "江南风场 5号风机"
+    farm: "江南风场"
+    model: "GW-2000"
+  # ... (WT-106 ~ WT-150)
+
+  # ── Farm D: 华北风场 (Huabei) ──
+  - id: "WT-151"
+    name: "华北风场 1号风机"
+    farm: "华北风场"
+    model: "GW-2000"
+  - id: "WT-152"
+    name: "华北风场 2号风机"
+    farm: "华北风场"
+    model: "SE-3000"
+  - id: "WT-153"
+    name: "华北风场 3号风机"
+    farm: "华北风场"
+    model: "GW-1500"
+  - id: "WT-154"
+    name: "华北风场 4号风机"
+    farm: "华北风场"
+    model: "EN-2500"
+  - id: "WT-155"
+    name: "华北风场 5号风机"
+    farm: "华北风场"
+    model: "GW-2000"
+  # ... (WT-156 ~ WT-200)
+
+  # NOTE: For full 200-device deployment, expand the list.
+  # The simulator will work with whatever devices are defined here.

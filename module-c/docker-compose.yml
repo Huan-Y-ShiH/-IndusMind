@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  # ── Module A: Prediction Engine ─────────────────────────────────
+  module-a:
+    build: ../module-a
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  # ── Module B: Agent Engine ──────────────────────────────────────
+  module-b:
+    build: ../module-b
+    ports:
+      - "8002:8002"
+    environment:
+      - PREDICTION_API_URL=http://module-a:8001
+    depends_on:
+      - module-a
+    restart: unless-stopped
+
+  # ── Module C: API Gateway ───────────────────────────────────────
+  module-c-backend:
+    build: ./backend
+    ports:
+      - "8003:8003"
+    environment:
+      - MODULE_A_URL=http://module-a:8001
+      - MODULE_B_URL=http://module-b:8002
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    depends_on:
+      - module-a
+      - module-b
+    restart: unless-stopped
+
+  # ── Module C: Frontend (Nginx) ──────────────────────────────────
+  module-c-frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_BASE=http://localhost:8003
+    depends_on:
+      - module-c-backend
+    restart: unless-stopped
