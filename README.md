@@ -128,15 +128,6 @@ ssh -N -L 18000:localhost:8000 user@bitahub &
 uvicorn module-a/frontend_proxy:app --port 9000 &
 ```
 
-## 待完成 (TODO)
-
-- [ ] 搭建 Module A/B 的真实实现后，网关转发无缝切换
-- [ ] 前端 ECharts 图表接入真实数据
-- [ ] WebSocket 告警与后端 Agent 引擎联动
-- [ ] IoT 模拟器添加更多故障场景（齿轮、叶片、发电机）
-- [ ] 前端单元测试 + E2E 测试
-- [ ] CI/CD pipeline (GitHub Actions)
-
 ## 分支策略
 
 - `main` — 受保护，仅PR合并
