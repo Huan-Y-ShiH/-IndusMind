@@ -18,8 +18,9 @@
 │ module-b (人B): Agent智能引擎                             │
 │   盘古RAG + 多Agent调度 + FastAPI :8002                   │
 ├─────────────────────────────────────────────────────────┤
-│ module-c (人C): 平台与可视化                               │
-│   React大屏 + API网关 + FastAPI :8003                    │
+│ module-c (人C): 全栈平台与可视化                           │
+│   React 18 监控大屏 + FastAPI 网关 :8003 + IoT模拟器        │
+│   统一入口: docker-compose 4服务编排                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -86,20 +87,45 @@ Bitahub GPU 服务器 (RTX 4090)
 
 详见 `module-a/README.md` — v0→v1→v2 完整进化史。
 
+## module-c 平台能力
+
+| 组件 | 技术栈 | 端口 | 说明 |
+|------|--------|------|------|
+| API 网关 | FastAPI + httpx + WebSocket | 8003 | 统一入口，透明转发 module-a/b，实时告警推送 |
+| 前端大屏 | React 18 + TypeScript + Vite + Antd 5 + ECharts + Zustand | 5173 | Dashboard、设备树、告警中心、RUL仪表盘 |
+| IoT 模拟器 | Python 3.11 + requests + PyYAML | — | 200台风机的传感器数据生成，可配故障场景 |
+
+API 路由：
+```
+/api/v1/predict/*      → Module A (8001)   RUL预测 + 异常检测
+/api/v1/diagnose/*     → Module B (8002)   故障诊断
+/ws/alerts             → 本地 WebSocket    实时告警推送
+/health                → 本地              健康检查
+```
+
 ## 快速启动
 
 ```bash
+# 方式一：Docker Compose 一键启动（推荐）
+docker-compose up --build
+# → 前端 http://localhost:5173 | 网关 http://localhost:8003/docs
+
+# 方式二：分模块启动
 # 角色A：启动预测模型（在 Bitahub 上）
 cd module-a && bash run_api.sh
 # → http://bitahub:8000/health
 
-# 角色C：建立隧道 + 代理（在前端服务器上）
+# 角色B：启动 Agent 引擎
+cd module-b && uvicorn src.main:app --port 8002
+
+# 角色C：启动网关 + 前端
+cd module-c/backend && uvicorn api.main:app --reload --port 8003 &
+cd module-c/frontend && pnpm install && pnpm dev &
+cd module-c/iot-simulator && python simulator.py --interval 2 &
+
+# 建立 SSH 隧道（角色C 维护）
 ssh -N -L 18000:localhost:8000 user@bitahub &
 uvicorn module-a/frontend_proxy:app --port 9000 &
-
-# 访问
-前端: http://localhost:5173
-API网关: http://localhost:8003/docs
 ```
 
 ## 分支策略
