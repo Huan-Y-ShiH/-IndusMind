@@ -8,6 +8,9 @@ services:
       - HOST=0.0.0.0
       - PORT=8003
       - DEV_MODE=false
+      - HISTORY_FILE=/app/data/diagnosis_history.json
+    volumes:
+      - history_data:/app/data
     restart: unless-stopped
 
   module-c-frontend:
@@ -17,3 +20,6 @@ services:
     depends_on:
       - module-c-backend
     restart: unless-stopped
+
+volumes:
+  history_data:

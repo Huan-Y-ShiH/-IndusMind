@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { DiagnosisRecord } from '../types/device';
 
 // ═══════════════════════════════════════════════════════════════════
 //  Shared axios instance — still used by mock-based pages
@@ -194,5 +195,16 @@ export const diagnoseApi = {
     ),
   pollJob: (jobId: string): Promise<DiagnoseJobResponse> =>
     getDiagnoseClient().get(`/jobs/${jobId}`).then((r) => r.data.data as DiagnoseJobResponse),
+};
+
+export const historyApi = {
+  list: (): Promise<DiagnosisRecord[]> =>
+    apiClient.get('/v1/history').then((r) => r.data.data),
+  get: (id: string): Promise<DiagnosisRecord> =>
+    apiClient.get(`/v1/history/${id}`).then((r) => r.data.data),
+  create: (record: DiagnosisRecord): Promise<void> =>
+    apiClient.post('/v1/history', record),
+  delete: (id: string): Promise<void> =>
+    apiClient.delete(`/v1/history/${id}`),
 };
 

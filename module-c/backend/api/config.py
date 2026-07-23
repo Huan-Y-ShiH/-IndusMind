@@ -31,5 +31,8 @@ class Settings:
     # Development mode — when True, test endpoints are enabled
     dev_mode: bool = os.getenv("DEV_MODE", "true").lower() in ("1", "true", "yes")
 
+    # Diagnosis history persistence file
+    history_file: str = os.getenv("HISTORY_FILE", "./data/diagnosis_history.json")
+
 
 settings = Settings()

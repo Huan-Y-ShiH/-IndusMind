@@ -45,3 +45,27 @@ export interface SensorSnapshot {
   phase_current_l2: number;
   phase_current_l3: number;
 }
+
+// ── Diagnosis History ──────────────────────────────────────────────
+
+import type { MonitorResult, DiagnoseResult } from '../services/api';
+
+export interface DiagnosisRecord {
+  id: string;
+  deviceId: string;
+  deviceName: string;
+  farm: string;
+  model: string;
+  timestamp: string;       // ISO-8601, diagnosis start time
+  jobId: string;
+  rulPredicted: number;
+  anomalyType: string | null;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  rootCause: string;
+  confidence: number;
+  urgency: string;
+  actionPlan: string[];
+  logicPath: string[];
+  monitorResult: MonitorResult;
+  diagnoseResult: DiagnoseResult;
+}

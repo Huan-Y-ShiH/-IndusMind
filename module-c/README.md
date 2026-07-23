@@ -1,117 +1,150 @@
-# Module C — 队员C 开发笔记
+# Module C — 全栈平台与可视化
 
-> **角色：全栈平台与可视化工程师**
-> **职责：API网关、WebSocket实时推送、React监控大屏、IoT数据模拟器、Docker Compose 编排**
+> **角色：全栈平台与可视化工程师（队员C）**
+> **职责：前端监控大屏、FastAPI API网关、WebSocket实时推送、IoT数据模拟器、阿里云ECS部署**
+> **当前版本：v2.5（诊断历史功能 + 服务端持久化）**
 
 ---
 
-## 🏗️ 项目结构
+## 项目结构
 
 ```
 module-c/
-├── docker-compose.yml          # 4服务编排: module-a/b/backend/frontend
-├── docker-compose.prod.yml     # 生产环境编排
-├── backend/                    # FastAPI 网关 (端口 8003)
-│   ├── api/
-│   │   ├── main.py             # FastAPI app + CORS + 生命周期
-│   │   ├── config.py           # 环境变量: MONITOR_URL / API_TOKEN / DEV_MODE
-│   │   ├── routers/
-│   │   │   ├── gateway.py      # 透明转发 /api/v1/monitor/* → Module A
-│   │   │   └── ws.py           # WebSocket /ws/alerts 实时告警推送
-│   │   ├── middleware/
-│   │   │   └── auth.py         # Bearer Token 鉴权（可配置开关）
-│   │   └── services/
-│   │       ├── proxy.py        # httpx 异步代理 + 路由表
-│   │       └── ws_manager.py   # WebSocket 连接池管理
+├── docker-compose.yml              # 生产编排（仅2容器：frontend + backend）
+├── docker-compose.prod.yml         # 生产版 docker-compose（含 history_data volume）
+├── README.md
+├── backend/                        # FastAPI 网关（端口 8003）
 │   ├── Dockerfile
-│   ├── pyproject.toml          # Poetry 依赖管理
+│   ├── pyproject.toml
+│   ├── api/
+│   │   ├── main.py                 # FastAPI app + lifespan（服务注入）
+│   │   ├── config.py               # 环境变量配置
+│   │   ├── routers/
+│   │   │   ├── gateway.py          # 透明转发 Module A（catch-all，需在 history 之后注册）
+│   │   │   ├── history.py          # 🆕 诊断历史 CRUD API（JSON 文件持久化）
+│   │   │   └── ws.py               # WebSocket 告警推送
+│   │   ├── services/
+│   │   │   ├── proxy.py            # ProxyService：路由表 + httpx 连接池
+│   │   │   └── ws_manager.py       # ConnectionManager：WS 连接管理 + 广播
+│   │   └── middleware/
+│   │       └── auth.py             # Bearer Token 鉴权
 │   └── tests/
-│       └── test_gateway.py     # 基础冒烟测试
-├── frontend/                   # React 18 + Vite (端口 5173)
-│   ├── src/
-│   │   ├── pages/              # Dashboard, DeviceDetail, AlertCenter, Settings
-│   │   ├── components/         # Layout, RealTimeChart, RULGauge, DeviceTree,
-│   │   │                       # AlertModal, AgentFlow, dashboard/(子组件)
-│   │   ├── services/           # api.ts (axios), websocket.ts, mock.ts,
-│   │   │                       # sensorSimulator.ts, alertDetailBuilder.ts
-│   │   ├── stores/             # useDeviceStore.ts (Zustand)
-│   │   ├── constants/          # devices.ts 设备清单
-│   │   ├── hooks/              # useDiagnosisFlow.ts
-│   │   ├── types/              # device.ts 类型定义
-│   │   └── utils/              # riskLevel.ts 风险等级工具
-│   ├── Dockerfile              # Nginx 生产镜像
-│   ├── nginx.conf              # Nginx 反向代理配置
-│   └── vite.config.ts
-└── iot-simulator/              # 数据模拟器
-    ├── simulator.py            # 21台风机传感器数据生成 + 异常注入
-    └── config.yaml             # 设备配置（4个风场: 东海/西山/南岭/北原）
+├── frontend/                       # React 18 + TypeScript + Vite
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── vite.config.ts
+│   └── src/
+│       ├── App.tsx                 # 路由表（/ /device/:id /alerts /history /diagnosis/:rid /settings）
+│       ├── types/
+│       │   └── device.ts           # DeviceInfo, AlertItem, SensorSnapshot, DiagnosisRecord
+│       ├── constants/
+│       │   └── devices.ts          # FARMS, MODELS, RUL 阈值
+│       ├── utils/
+│       │   └── riskLevel.ts        # rulToRiskLevel()
+│       ├── hooks/
+│       │   └── useDiagnosisFlow.ts # 诊断状态机（Monitor → Diagnose → 轮询 → 自动写入历史）
+│       ├── stores/
+│       │   ├── useDeviceStore.ts           # Zustand：设备列表 + 告警
+│       │   └── useDiagnosisHistoryStore.ts # 🆕 Zustand：诊断历史（API 同步）
+│       ├── services/
+│       │   ├── api.ts              # axios 封装（monitorApi + diagnoseApi + historyApi）
+│       │   ├── websocket.ts        # WebSocket 客户端（常驻 Layout）
+│       │   ├── mock.ts             # Mock 数据生成
+│       │   ├── sensorSimulator.ts  # CMAPSS 传感器数据模拟
+│       │   └── alertDetailBuilder.ts
+│       ├── pages/
+│       │   ├── Dashboard.tsx               # 主监控大屏
+│       │   ├── DeviceDetail.tsx            # 单设备详情 + 诊断 + 历史列表
+│       │   ├── AlertCenter.tsx             # 告警中心
+│       │   ├── DiagnosisHistory.tsx        # 🆕 全局诊断历史（表格 + 筛选）
+│       │   ├── DiagnosisRecordView.tsx     # 🆕 诊断记录详情页（SOLUTION 为主体）
+│       │   └── Settings.tsx                # 系统设置
+│       └── components/
+│           ├── Layout.tsx                  # 顶栏 + 侧栏（含诊断历史菜单项）
+│           ├── RealTimeChart.tsx
+│           ├── RULGauge.tsx
+│           ├── DeviceTree.tsx
+│           ├── AlertModal.tsx
+│           ├── AgentFlow.tsx
+│           └── dashboard/
+│               ├── DeviceStatusDonut.tsx
+│               ├── FarmHealthCard.tsx
+│               └── AlertTimeline.tsx
+└── iot-simulator/
+    ├── simulator.py
+    └── config.yaml
 ```
 
-## 🔧 技术栈
+## 技术栈
 
 | 层 | 技术 |
 |----|------|
-| 网关 | FastAPI + httpx（异步代理）+ WebSocket |
-| 前端 | React 18 + TypeScript + Vite + Antd 5 + ECharts + Tailwind CSS + Zustand |
+| 网关后端 | Python 3.11 + FastAPI + httpx + WebSocket |
+| 前端 | React 18 + TypeScript + Vite + Ant Design 5 + ECharts + Tailwind CSS + Zustand |
 | 模拟器 | Python 3.11 + requests + PyYAML |
-| 编排 | Docker Compose（4 services）|
-| 包管理 | 后端 Poetry / 前端 npm |
+| 编排 | Docker Compose（仅 module-c 两容器：frontend + backend）|
+| 部署 | 阿里云 ECS (39.96.44.253) Ubuntu 22.04 |
 
-## 🚀 本地启动
+## 设计风格
 
-### 1. 启动后端网关
+**暗夜工控（NASA 控制中心风格）**：
+- 底色 `#0a0e14`，面板 `#111620`
+- 霓虹绿强调色 `#00e676`
+- monospace 字体，UTC 时钟
+- 顶栏 52px + 绿色底线，侧栏 210px
+
+## 本地启动
+
 ```bash
-cd backend
-poetry install
-uvicorn api.main:app --reload --port 8003
+# 后端
+cd backend && poetry install && uvicorn api.main:app --reload --port 8003
+
+# 前端
+cd frontend && npm install && npm run dev    # http://localhost:5173
 ```
 
-### 2. 启动前端
-```bash
-cd frontend
-npm install
-npm run dev              # http://localhost:5173
+## 诊断历史功能（v2.5 新增）
+
+诊断完成后自动保存到服务端，跨设备/浏览器可访问：
+
+```
+诊断完成 → POST /api/v1/history → JSON 文件持久化（Docker volume）
+     ↓
+浏览 /history → 全局表格（筛选/排序/删除）
+     ↓
+点击 VIEW → /diagnosis/:recordId → SOLUTION 为主体页面
 ```
 
-### 3. 启动数据模拟器
+**持久化**：Docker named volume `history_data` → 容器内 `/app/data/diagnosis_history.json`，不随容器重建丢失。
+
+## API 路由
+
+| 路径 | 处理方式 | 说明 |
+|------|----------|------|
+| `/api/v1/monitor/*` | Nginx → SSH隧道 → Bitahub A:8000 | Module A RUL 预测 |
+| `/diagnose/*` | Nginx → http://123.56.100.219/api/v1/diagnose/* | Module B 诊断 |
+| `/api/v1/history` | Nginx → backend:8003 | 🆕 诊断历史 CRUD |
+| `/api/*` | Nginx → backend:8003 | 网关通用路由 |
+| `/ws/*` | Nginx → backend:8003 | WebSocket |
+| `/health` | backend:8003 | 健康检查 |
+
+## 生产部署
+
 ```bash
-cd iot-simulator
-pip install -r requirements.txt
-python simulator.py --interval 2
+# 构建 + 部署
+cd module-c/frontend && npm run build
+scp -i ~/.ssh/indusmind_key -r dist/* root@39.96.44.253:/tmp/dist/
+ssh root@39.96.44.253 "docker cp /tmp/dist/. module-c-module-c-frontend-1:/usr/share/nginx/html/"
+
+# 后端更新
+tar czf backend.tar.gz backend/
+scp backend.tar.gz root@39.96.44.253:/tmp/
+ssh root@39.96.44.253 "cd /opt/indusmind/module-c && tar xzf /tmp/backend.tar.gz && docker compose up -d --build module-c-backend"
 ```
 
-### 4. 全栈启动 (Docker)
-```bash
-docker-compose up --build
-```
+## 协作铁律
 
-## 📋 API 路由映射
-
-| 请求路径 | 转发目标 | 说明 |
-|----------|----------|------|
-| `/api/v1/monitor/*` | Module A (MONITOR_URL, 默认 `127.0.0.1:18000`) | RUL预测 + 异常检测 |
-| `/ws/alerts` | 本地 WebSocket | 实时告警推送 |
-| `/ws/alerts/test` | 本地（DEV_MODE 仅） | 手动推送模拟告警 |
-| `/health` | 本地 | 健康检查 |
-
-> **注意**: gateway 目前仅转发 `/api/v1/monitor/*` 到 Module A。Module B 的 diagnose/knowledge/workflow 路由待 Module B 就绪后接入。
-
-## 🎨 暗夜工控设计规范（NASA 控制中心风格）
-
-| Token | 色值 | 用途 |
-|-------|------|------|
-| `--bg-base` | `#0a0e14` | 最深底色 |
-| `--bg-panel` | `#111620` | 面板/卡片 |
-| `--bg-header` | `#0d1117` | 顶栏 52px |
-| `--bg-sidebar` | `#0c1016` | 侧边栏 210px |
-| `--accent-primary` | `#00e676` | 霓虹绿数据主色 |
-| `--status-danger` | `#ff1744` | 红色告警脉冲 |
-| `--font-mono` | JetBrains Mono / Consolas | 等宽字体 |
-
-## ⚠️ 协作铁律
-
-1. 统一响应: `{"code": 0, "data": {...}, "msg": "success"}`
-2. 错误响应: `{"code": 500, "data": null, "msg": "..."}`
-3. 命名: Python→snake_case, TS→camelCase, API→kebab-case
-4. 跨模块通信**只能通过 HTTP**，禁止 import 其他模块代码
-5. 全项目统一 Python 3.11 + FastAPI + Poetry
+1. 统一响应格式：`{"code": 0, "data": {...}, "msg": "success"}`
+2. Python→snake_case, TypeScript→camelCase, API→kebab-case
+3. 跨模块通信只走 HTTP API，禁止 import
+4. GitHub: `Huan-Y-ShiH/-IndusMind.git`，main 受保护，仅 PR 合并

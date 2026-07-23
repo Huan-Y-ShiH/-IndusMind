@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Button, Select, Tag, Progress, Spin, Collapse, Space, Empty } from 'antd';
+import { Card, Button, Select, Tag, Progress, Spin, Collapse, Space, Empty, Timeline } from 'antd';
 import {
   ArrowLeftOutlined,
   ThunderboltOutlined,
@@ -10,16 +10,34 @@ import AgentFlow from '../components/AgentFlow';
 import { rulToRiskLevel } from '../utils/riskLevel';
 import { RUL_GAUGE_MAX } from '../constants/devices';
 import { useDeviceStore } from '../stores/useDeviceStore';
+import { useDiagnosisHistoryStore } from '../stores/useDiagnosisHistoryStore';
 import { useDiagnosisFlow } from '../hooks/useDiagnosisFlow';
+import type { DiagnosisRecord } from '../types/device';
+
+const RISK_TAG_COLOR: Record<DiagnosisRecord['riskLevel'], string> = {
+  critical: 'red',
+  high: 'orange',
+  medium: 'gold',
+  low: 'blue',
+};
 
 const DeviceDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
   const devices = useDeviceStore((s) => s.devices);
+  const allHistoryRecords = useDiagnosisHistoryStore((s) => s.records);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>(id);
 
   const diagnosis = useDiagnosisFlow(selectedDeviceId);
+
+  const deviceHistoryRecords = useMemo(
+    () =>
+      selectedDeviceId
+        ? allHistoryRecords.filter((r) => r.deviceId === selectedDeviceId)
+        : [],
+    [allHistoryRecords, selectedDeviceId],
+  );
 
   const selectedDevice = useMemo(
     () => devices.find((d) => d.id === selectedDeviceId),
@@ -51,6 +69,10 @@ const DeviceDetail: React.FC = () => {
     getUrgencyColor,
   } = diagnosis;
 
+  const handleReset = useCallback(() => {
+    resetFlow();
+  }, [resetFlow]);
+
   return (
     <div>
       {/* ── Header bar ─────────────────────────────────────── */}
@@ -75,7 +97,7 @@ const DeviceDetail: React.FC = () => {
             showSearch
             value={selectedDeviceId}
             onChange={(val) => {
-              resetFlow();
+              handleReset();
               setSelectedDeviceId(val);
             }}
             placeholder="Select device..."
@@ -110,7 +132,7 @@ const DeviceDetail: React.FC = () => {
             START DIAGNOSIS
           </Button>
           {(stage === 'complete' || stage === 'error') && (
-            <Button onClick={resetFlow} style={{ fontFamily: 'var(--font-mono)' }}>
+            <Button onClick={handleReset} style={{ fontFamily: 'var(--font-mono)' }}>
               RESET
             </Button>
           )}
@@ -128,7 +150,7 @@ const DeviceDetail: React.FC = () => {
           <p style={{ color: 'var(--status-danger)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
             ■ ERROR: {errorMsg}
           </p>
-          <Button onClick={resetFlow} size="small" style={{ marginTop: 8 }}>
+          <Button onClick={handleReset} size="small" style={{ marginTop: 8 }}>
             RETRY
           </Button>
         </Card>
@@ -202,6 +224,15 @@ const DeviceDetail: React.FC = () => {
                       rulToRiskLevel(selectedDevice.rulHours)
                     }
                   />
+
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: 27, fontWeight: 700, color: 'var(--accent-primary)', fontFamily: 'var(--font-mono)' }}>
+                      {selectedDevice?.rulHours ?? '—'}
+                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', marginLeft: 4 }}>
+                      cyc
+                    </span>
+                  </div>
 
                   <div
                     style={{
@@ -747,6 +778,94 @@ const DeviceDetail: React.FC = () => {
             </Card>
           </div>
         </>
+      )}
+
+      {/* ── Diagnosis History ──────────────────────────────── */}
+      {selectedDeviceId && (
+        <Card
+          style={{ marginTop: 16 }}
+          title={
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+              ■ DIAGNOSIS HISTORY
+            </span>
+          }
+          size="small"
+        >
+          {deviceHistoryRecords.length === 0 ? (
+            <Empty
+              description={
+                <span style={{ color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>
+                  No diagnosis history for this device yet.
+                </span>
+              }
+            />
+          ) : (
+            <Timeline
+              items={deviceHistoryRecords.map((record) => ({
+                color:
+                  record.riskLevel === 'critical' || record.riskLevel === 'high'
+                    ? 'red'
+                    : record.riskLevel === 'medium'
+                      ? 'orange'
+                      : 'green',
+                children: (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 200 }}>
+                      <div
+                        style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 11,
+                          color: 'var(--text-secondary)',
+                          marginBottom: 4,
+                        }}
+                      >
+                        {formatTimestamp(record.timestamp)}
+                      </div>
+                      <Space size={8} wrap style={{ marginBottom: 6 }}>
+                        <Tag
+                          color={RISK_TAG_COLOR[record.riskLevel]}
+                          style={{ fontFamily: 'var(--font-mono)', fontSize: 10, margin: 0 }}
+                        >
+                          {record.riskLevel.toUpperCase()}
+                        </Tag>
+                        <Tag style={{ fontFamily: 'var(--font-mono)', fontSize: 10, margin: 0 }}>
+                          RUL: {record.rulPredicted.toFixed(0)} cyc
+                        </Tag>
+                      </Space>
+                      <div
+                        style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 11,
+                          color: 'var(--text-dim)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {record.rootCause.length > 120
+                          ? `${record.rootCause.slice(0, 120)}...`
+                          : record.rootCause}
+                      </div>
+                    </div>
+                    <Button
+                      size="small"
+                      onClick={() => navigate(`/diagnosis/${record.id}`, { state: { from: 'device' } })}
+                      style={{ fontFamily: 'var(--font-mono)', flexShrink: 0 }}
+                    >
+                      VIEW
+                    </Button>
+                  </div>
+                ),
+              }))}
+            />
+          )}
+        </Card>
       )}
     </div>
   );

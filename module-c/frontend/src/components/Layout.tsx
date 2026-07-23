@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell, Settings, Activity, AlertTriangle, Monitor, Menu, X } from 'lucide-react';
+import { Bell, Settings, Activity, AlertTriangle, Monitor, Menu, X, Clock } from 'lucide-react';
 import { useDeviceStore } from '../stores/useDeviceStore';
 import { alertWS, type WsAlertMessage } from '../services/websocket';
 import type { AlertItem } from '../types/device';
@@ -16,6 +16,7 @@ import { generateAlertsFromDevices } from '../services/mock';
 const MENU_ITEMS = [
   { path: '/', label: '监控大屏', icon: Monitor },
   { path: '/alerts', label: '告警中心', icon: AlertTriangle },
+  { path: '/history', label: '诊断历史', icon: Clock },
   { path: '/settings', label: '系统设置', icon: Settings },
 ];
 

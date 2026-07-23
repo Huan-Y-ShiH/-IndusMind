@@ -10,11 +10,64 @@ import { monitorApi, diagnoseApi } from '../services/api';
 import { generateCmapssSensorData } from '../services/sensorSimulator';
 import { rulToRiskLevel } from '../utils/riskLevel';
 import { useDeviceStore } from '../stores/useDeviceStore';
+import { useDiagnosisHistoryStore } from '../stores/useDiagnosisHistoryStore';
+import type { DiagnosisRecord, DeviceInfo } from '../types/device';
 import type {
   MonitorResult,
   DiagnoseResult,
   DiagnoseJobResponse,
 } from '../services/api';
+
+function createRecordId(): string {
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // fallback below
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function buildDiagnosisRecord(
+  device: DeviceInfo,
+  monitorResult: MonitorResult,
+  diagnoseResult: DiagnoseResult,
+  jobId: string,
+  startTimestamp: string,
+): DiagnosisRecord {
+  return {
+    id: createRecordId(),
+    deviceId: device.id,
+    deviceName: device.name,
+    farm: device.farm,
+    model: device.model,
+    timestamp: startTimestamp,
+    jobId,
+    rulPredicted: monitorResult.rul_predicted,
+    anomalyType: monitorResult.anomaly_type,
+    riskLevel: rulToRiskLevel(monitorResult.rul_predicted),
+    rootCause: diagnoseResult.diagnosis.root_cause,
+    confidence: diagnoseResult.diagnosis.confidence,
+    urgency: diagnoseResult.solution.urgency,
+    actionPlan: diagnoseResult.solution.action_plan,
+    logicPath: diagnoseResult.diagnosis.logic_path ?? [],
+    monitorResult,
+    diagnoseResult,
+  };
+}
+
+function persistCompletedDiagnosis(
+  device: DeviceInfo,
+  monitorResult: MonitorResult,
+  diagnoseResult: DiagnoseResult,
+  jobId: string,
+  startTimestamp: string,
+) {
+  void useDiagnosisHistoryStore.getState().addRecord(
+    buildDiagnosisRecord(device, monitorResult, diagnoseResult, jobId, startTimestamp),
+  );
+}
 
 type FlowStage =
   | 'idle'
@@ -46,6 +99,7 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
 
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = useRef(false);
+  const diagnosisStartRef = useRef<string>(new Date().toISOString());
 
   useEffect(() => {
     return () => {
@@ -75,6 +129,7 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
 
     resetFlow();
     abortRef.current = false;
+    diagnosisStartRef.current = new Date().toISOString();
     setStage('analyzing');
 
     let phase: 'monitor' | 'diagnose_submit' | 'poll' = 'monitor';
@@ -130,6 +185,13 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
         setDiagnoseResult(bResponse.result);
         setDiagnoseProgress(100);
         setStage('complete');
+        persistCompletedDiagnosis(
+          selectedDevice,
+          aResult,
+          bResponse.result,
+          newJobId,
+          diagnosisStartRef.current,
+        );
         return;
       }
       if (bResponse.status === 'failed') {
@@ -153,6 +215,13 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
             setDiagnoseResult(pollResp.result);
             setDiagnoseProgress(100);
             setStage('complete');
+            persistCompletedDiagnosis(
+              selectedDevice,
+              aResult,
+              pollResp.result,
+              newJobId,
+              diagnosisStartRef.current,
+            );
             if (pollTimerRef.current) {
               clearInterval(pollTimerRef.current);
               pollTimerRef.current = null;
@@ -204,6 +273,23 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
       setStage('error');
     }
   }, [deviceId, selectedDevice, resetFlow, stage]);
+
+  const loadHistoricalRecord = useCallback((record: DiagnosisRecord) => {
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+    abortRef.current = false;
+    setErrorMsg(null);
+    setErroredStep(undefined);
+    setLastProgress(undefined);
+    setMonitorResult(record.monitorResult);
+    setDiagnoseResult(record.diagnoseResult);
+    setDiagnoseStatus('succeeded');
+    setDiagnoseProgress(100);
+    setJobId(record.jobId);
+    setStage('complete');
+  }, []);
 
   const formatTimestamp = (ts: string) => {
     try {
@@ -259,6 +345,7 @@ export function useDiagnosisFlow(deviceId: string | undefined) {
     jobId,
     startDiagnosis,
     resetFlow,
+    loadHistoricalRecord,
     isRunning,
     hasMonitorResult,
     hasDiagnoseActivity,
